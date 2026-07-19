@@ -1,5 +1,10 @@
-import type { Activity, Trip } from '../types';
+import type { Activity, Trip, Vote } from '../types';
 import { formatDay, tripDays } from '../types';
+
+/** Anything with per-person votes — activities and stays alike. */
+interface Voted {
+  votes: Record<string, Vote>;
+}
 
 const SLOT_ORDER: Record<string, number> = { allday: 0, morning: 1, afternoon: 2, evening: 3 };
 
@@ -11,12 +16,12 @@ export interface DayGroup {
   topId: string | null;
 }
 
-export function goingCount(act: Activity): number {
-  return Object.values(act.votes).filter((v) => v.in).length;
+export function goingCount(item: Voted): number {
+  return Object.values(item.votes).filter((v) => v.in).length;
 }
 
-export function goingNames(act: Activity): string[] {
-  return Object.entries(act.votes)
+export function goingNames(item: Voted): string[] {
+  return Object.entries(item.votes)
     .filter(([, vote]) => vote.in)
     .map(([name]) => name)
     .sort((a, b) => a.localeCompare(b));

@@ -29,6 +29,30 @@ export interface Activity {
   deleted?: boolean;
 }
 
+/** A remark on a stay option. Append-only and immutable — that's what makes comment merging trivially conflict-free. */
+export interface StayComment {
+  id: string;
+  author: string;
+  text: string;
+  ts: number;
+}
+
+/** An accommodation candidate the group is weighing up. */
+export interface Stay {
+  id: string;
+  title: string;
+  url: string;
+  /** Free-text facts: price, beds, distance to town, … (no scraping — entered by hand). */
+  details: string;
+  votes: Record<string, Vote>;
+  comments: StayComment[];
+  /** The crowned choice. LWW via updatedAt like other stay fields. */
+  decided?: boolean;
+  createdBy: string;
+  updatedAt: number;
+  deleted?: boolean;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -38,6 +62,8 @@ export interface Trip {
   end: string;
   updatedAt: number;
   activities: Activity[];
+  /** Accommodation candidates — absent on trips from before this feature. */
+  stays?: Stay[];
 }
 
 export const CATEGORIES: Record<Category, { label: string; emoji: string }> = {

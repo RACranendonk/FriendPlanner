@@ -82,3 +82,55 @@ describe('mergeTrips', () => {
     expect(mergeTrips(local, incoming).name).toBe('Renamed trip');
   });
 });
+
+describe('mergeTrips: stays', () => {
+  const makeStay = (overrides: Partial<import('../types').Stay> = {}): import('../types').Stay => ({
+    id: 's1',
+    title: 'Farmhouse',
+    url: '',
+    details: '',
+    votes: {},
+    comments: [],
+    createdBy: 'Alex',
+    updatedAt: 1,
+    ...overrides,
+  });
+
+  it('unions comments from both sides, ordered by time', () => {
+    const local = makeTrip({
+      stays: [makeStay({ comments: [{ id: 'c1', author: 'Alex', text: 'Great pool', ts: 2 }] })],
+    });
+    const incoming = makeTrip({
+      stays: [makeStay({ comments: [{ id: 'c2', author: 'Billie', text: 'Too far from town', ts: 1 }] })],
+    });
+    const merged = mergeTrips(local, incoming);
+    expect(merged.stays![0].comments.map((c) => c.id)).toEqual(['c2', 'c1']);
+    expect(mergeTrips(incoming, local).stays![0].comments.map((c) => c.id)).toEqual(['c2', 'c1']);
+  });
+
+  it('survives merging with a copy from before the stays feature', () => {
+    const withStays = makeTrip({ stays: [makeStay()], updatedAt: 1 });
+    const preFeature = makeTrip({ updatedAt: 5 });
+    delete (preFeature as Partial<Trip>).stays;
+    expect(mergeTrips(preFeature, withStays).stays!.length).toBe(1);
+    expect(mergeTrips(withStays, preFeature).stays!.length).toBe(1);
+  });
+
+  it('merges stay votes per person and lets the newer edit win on fields', () => {
+    const local = makeTrip({
+      stays: [makeStay({ title: 'Old', updatedAt: 2, votes: { Alex: { in: true, ts: 5 } } })],
+    });
+    const incoming = makeTrip({
+      stays: [makeStay({ title: 'Renamed', updatedAt: 9, votes: { Billie: { in: true, ts: 1 } } })],
+    });
+    const merged = mergeTrips(local, incoming).stays![0];
+    expect(merged.title).toBe('Renamed');
+    expect(Object.keys(merged.votes).sort()).toEqual(['Alex', 'Billie']);
+  });
+
+  it('keeps stay deletions via tombstones', () => {
+    const local = makeTrip({ stays: [makeStay({ deleted: true, updatedAt: 9 })] });
+    const incoming = makeTrip({ stays: [makeStay({ updatedAt: 1 })] });
+    expect(mergeTrips(local, incoming).stays![0].deleted).toBe(true);
+  });
+});
