@@ -2,11 +2,16 @@ import { useState } from 'react';
 import type { Activity } from '../types';
 import { CATEGORIES, SLOTS } from '../types';
 import { goingNames } from '../lib/grouping';
+import { linkInfo } from '../lib/linkinfo';
 
-/** Komoot tours and named places can be shown inline; other links just open in a new tab. */
+/**
+ * Only a named place gets an inline map snippet. Pasted links (Komoot, venue
+ * sites, …) stay plain hyperlinks — many of them refuse to render inside an
+ * iframe (Komoot's embed is blocked by Firefox, most sites send
+ * X-Frame-Options), so a link that always works beats a snippet that
+ * sometimes shows an error box.
+ */
 function embedUrl(act: Activity): string | null {
-  const komoot = act.locationUrl.match(/komoot\.[a-z.]+\/(?:[a-z-]+\/)?tour\/(\d+)/);
-  if (komoot) return `https://www.komoot.com/tour/${komoot[1]}/embed?profile=1`;
   if (act.locationName) return `https://maps.google.com/maps?q=${encodeURIComponent(act.locationName)}&output=embed`;
   return null;
 }
@@ -31,6 +36,7 @@ export function ActivityCard({
   const going = goingNames(activity);
   const imIn = me !== '' && going.includes(me);
   const map = embedUrl(activity);
+  const link = linkInfo(activity.locationUrl);
 
   return (
     <article className={`card activity${highlight ? ' popular' : ''}`}>
@@ -48,16 +54,9 @@ export function ActivityCard({
               </span>
             )}
           </div>
-          {(activity.locationName || activity.locationUrl) && (
+          {activity.locationName && (
             <p className="muted small">
-              📍{' '}
-              {activity.locationUrl ? (
-                <a href={activity.locationUrl} target="_blank" rel="noreferrer noopener">
-                  {activity.locationName || activity.locationUrl.replace(/^https?:\/\/(www\.)?/, '').slice(0, 40)}
-                </a>
-              ) : (
-                activity.locationName
-              )}
+              📍 {activity.locationName}
               {map && (
                 <>
                   {' · '}
@@ -66,6 +65,15 @@ export function ActivityCard({
                   </button>
                 </>
               )}
+            </p>
+          )}
+          {link && (
+            <p className="muted small">
+              🔗{' '}
+              <a href={link.href} target="_blank" rel="noreferrer noopener">
+                {link.label}
+              </a>
+              {link.label !== link.host && <span> ({link.host})</span>}
             </p>
           )}
           {activity.notes && <p className="small notes">{activity.notes}</p>}

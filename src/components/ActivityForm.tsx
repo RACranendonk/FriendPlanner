@@ -90,7 +90,7 @@ export function ActivityForm({
           />
         </label>
         <label className="field">
-          <span>Link (Google Maps, Komoot route, website…)</span>
+          <span>Activity link (Komoot route, tickets, website…)</span>
           <input
             value={locationUrl}
             placeholder="https://…"
