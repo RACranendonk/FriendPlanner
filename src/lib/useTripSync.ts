@@ -16,11 +16,14 @@ export function useTripSync(
   tripId: string,
   passphrase: string,
   onRemote: (incoming: Trip) => void,
+  onStale?: () => void,
 ): SyncStatus & { publish: (trip: Trip) => void } {
   const [status, setStatus] = useState<SyncStatus>({ connected: 0, total: 0 });
   const syncRef = useRef<TripSync | null>(null);
   const onRemoteRef = useRef(onRemote);
   onRemoteRef.current = onRemote;
+  const onStaleRef = useRef(onStale);
+  onStaleRef.current = onStale;
 
   useEffect(() => {
     if (!passphrase) return;
@@ -29,6 +32,7 @@ export function useTripSync(
       passphrase,
       (trip) => onRemoteRef.current(trip),
       (connected, total) => setStatus({ connected, total }),
+      () => onStaleRef.current?.(),
     );
     syncRef.current = sync;
     void sync.start();

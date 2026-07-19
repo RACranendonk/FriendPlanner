@@ -38,6 +38,11 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     // We hold changes the relays haven't seen (or they only had an older
     // version) — publish the merged state so everyone converges.
     if (!sameTrip(merged, incoming)) sync.publish(merged);
+  }, () => {
+    // Relays' copy is missing or a week old — re-seed with the local plan so
+    // invite links keep working through dormant months.
+    const current = tripRef.current;
+    if (current) sync.publish(current);
   });
 
   const groups = useMemo(() => (trip ? groupActivities(trip) : []), [trip]);

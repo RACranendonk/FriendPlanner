@@ -80,7 +80,10 @@ plans**:
 
 - Clearing your browser data deletes your local copy — rejoin with any shared link, or simply
   wait for the next sync from a friend.
-- The public relays are best-effort infrastructure. If they're ever unreachable, nothing is lost:
-  every device holds the full plan, and the Share dialog's link flow works as a manual fallback.
+- The public relays are best-effort infrastructure. If they're ever unreachable or drop old data,
+  nothing is lost: every device holds the full plan, and whenever someone opens a trip whose
+  shared copy has gone missing or is more than a week old, the app quietly re-uploads it. The
+  Share dialog's link flow works as a manual fallback — and dropping a backup link in the chat
+  after a big planning session is cheap insurance for long-dormant trips.
 - Editing the *same* activity at the same moment: the newer edit wins. Adding, voting, and
   deleting never conflict.

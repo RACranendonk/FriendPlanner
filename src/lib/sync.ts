@@ -13,6 +13,16 @@ import {
 const SUB_ID = 'trip';
 const PUBLISH_DEBOUNCE_MS = 1200;
 const MAX_RECONNECT_MS = 30_000;
+const STALE_SETTLE_MS = 6000;
+
+/** Re-seed threshold: one week. A weekly-active group never triggers it; a dormant trip refreshes at most once per open. */
+export const STALE_RESEED_SECONDS = 7 * 24 * 3600;
+
+/** Whether the newest relay event is old enough (or missing) to warrant a re-seed. */
+export function isStale(newestCreatedAtSeconds: number, nowMs: number): boolean {
+  if (newestCreatedAtSeconds === 0) return true;
+  return nowMs / 1000 - newestCreatedAtSeconds > STALE_RESEED_SECONDS;
+}
 
 /**
  * One-shot fetch of a trip's latest state from the relays — the invite-link
@@ -101,18 +111,25 @@ export class TripSync {
   private lastEvent: NostrEvent | null = null;
   private pendingTrip: Trip | null = null;
   private publishTimer: ReturnType<typeof setTimeout> | null = null;
+  private eoseSeen = new Set<string>();
+  private staleChecked = false;
+  private hasPublished = false;
 
   constructor(
     private readonly tripId: string,
     private readonly passphrase: string,
     private readonly onRemote: (trip: Trip) => void,
     private readonly onStatus: (connected: number, total: number) => void,
+    /** Called once per session when the relays' copy is missing or older than the re-seed threshold. */
+    private readonly onStale?: () => void,
   ) {}
 
   async start(): Promise<void> {
     this.keys = await deriveTripKeys(this.tripId, this.passphrase);
     if (this.closed) return;
     for (const url of RELAYS) this.connect(url);
+    // Fallback: evaluate staleness even if some relay never sends EOSE.
+    setTimeout(() => this.maybeReseed(), STALE_SETTLE_MS);
   }
 
   close(): void {
@@ -125,6 +142,7 @@ export class TripSync {
 
   /** Debounced: rapid consecutive edits collapse into one relay event. */
   publish(trip: Trip): void {
+    this.hasPublished = true;
     this.pendingTrip = trip;
     if (this.publishTimer) clearTimeout(this.publishTimer);
     this.publishTimer = setTimeout(() => void this.flush(), PUBLISH_DEBOUNCE_MS);
@@ -164,7 +182,7 @@ export class TripSync {
       // A relay that was down while we published still gets the newest state.
       if (this.lastEvent) ws.send(JSON.stringify(['EVENT', this.lastEvent]));
     };
-    ws.onmessage = (msg) => void this.handleMessage(String(msg.data));
+    ws.onmessage = (msg) => void this.handleMessage(url, String(msg.data));
     ws.onerror = () => ws.close();
     ws.onclose = () => {
       this.connected.delete(url);
@@ -181,14 +199,21 @@ export class TripSync {
     setTimeout(() => this.connect(url), delay);
   }
 
-  private async handleMessage(raw: string): Promise<void> {
+  private async handleMessage(url: string, raw: string): Promise<void> {
     let parsed: unknown;
     try {
       parsed = JSON.parse(raw);
     } catch {
       return;
     }
-    if (!Array.isArray(parsed) || parsed[0] !== 'EVENT' || parsed[1] !== SUB_ID) return;
+    if (!Array.isArray(parsed)) return;
+    if (parsed[0] === 'EOSE' && parsed[1] === SUB_ID) {
+      this.eoseSeen.add(url);
+      // Initial sync settled on every connected relay — safe to judge staleness.
+      if (this.eoseSeen.size >= this.connected.size && this.connected.size > 0) this.maybeReseed();
+      return;
+    }
+    if (parsed[0] !== 'EVENT' || parsed[1] !== SUB_ID) return;
     const event = parsed[2] as NostrEvent;
     if (!this.keys || !(await verifyTripEvent(event, this.keys.pubkey))) return;
     if (event.created_at > this.lastCreatedAt) this.lastCreatedAt = event.created_at;
@@ -202,5 +227,17 @@ export class TripSync {
 
   private emitStatus(): void {
     if (!this.closed) this.onStatus(this.connected.size, RELAYS.length);
+  }
+
+  /**
+   * At most once per session, and only when nothing was published anyway:
+   * if the relays' newest copy is missing or a week old, push the local state
+   * so short invite links keep working through dormant months. Deliberately
+   * not eager — an active group never triggers this.
+   */
+  private maybeReseed(): void {
+    if (this.staleChecked || this.closed || this.connected.size === 0) return;
+    this.staleChecked = true;
+    if (!this.hasPublished && isStale(this.lastCreatedAt, Date.now())) this.onStale?.();
   }
 }
