@@ -227,6 +227,18 @@ a {
   flex: 1;
 }
 
+/* An anchor that sits among buttons (e.g. the calendar link in card actions). */
+.linkbtn {
+  display: inline-block;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.linkbtn:hover {
+  background: var(--bg);
+}
+
 /* ---- home ---- */
 
 .trip-list {

@@ -3,6 +3,7 @@ import type { Activity, Trip } from '../types';
 import { CATEGORIES, SLOTS, formatDay } from '../types';
 import { goingNames, groupActivities } from '../lib/grouping';
 import { MapView, type MapPin } from './MapView';
+import { googleCalendarUrl } from '../lib/calendar';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
 import { listParticipants, withdrawParticipation } from '../lib/participation';
@@ -196,6 +197,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
                     activity={act}
                     me={me.trim()}
                     highlight={act.id === group.topId}
+                    calendarUrl={googleCalendarUrl(trip, act)}
                     onToggle={() => toggleVote(act)}
                     onEdit={() => setEditing(act)}
                     onDelete={() => removeActivity(act)}

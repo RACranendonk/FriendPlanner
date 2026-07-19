@@ -21,6 +21,7 @@ export function ActivityCard({
   activity,
   me,
   highlight,
+  calendarUrl,
   onToggle,
   onEdit,
   onDelete,
@@ -28,6 +29,7 @@ export function ActivityCard({
   activity: Activity;
   me: string;
   highlight: boolean;
+  calendarUrl: string | null;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -113,6 +115,17 @@ export function ActivityCard({
           {imIn ? "✓ I'm in — tap to leave" : "I'm in"}
         </button>
         <span className="spacer" />
+        {calendarUrl && (
+          <a
+            className="linkbtn"
+            href={calendarUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            title="Add to Google Calendar"
+          >
+            📅
+          </a>
+        )}
         <button className="ghost" onClick={onEdit}>
           Edit
         </button>

@@ -25,6 +25,9 @@ like, and the group can see at a glance who's going where — including when you
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
 - **Who's in** — the list of everyone participating. If someone drops out, remove them: their
   "I'm in"s disappear everywhere, but every idea they contributed stays.
+- **Add to calendar** — planned activities have a 📅 button that opens a prefilled Google
+  Calendar event (uses the departure time when set, otherwise a sensible window for the time of
+  day).
 - **Live sharing** — invite the group with one link and the plan stays in sync by itself:
   open tabs update within seconds, otherwise the next refresh catches up. Simultaneous edits
   merge sensibly (adding never conflicts; votes are per-person; deletions stick).
