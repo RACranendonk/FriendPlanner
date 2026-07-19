@@ -5,6 +5,7 @@ import { goingNames, groupActivities } from '../lib/grouping';
 import { MapView, type MapPin } from './MapView';
 import { googleCalendarUrl } from '../lib/calendar';
 import { StaysSection } from './StaysSection';
+import { ThemeToggle } from './ThemeToggle';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
 import { listParticipants, withdrawParticipation } from '../lib/participation';
@@ -124,6 +125,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
             ) : null}
           </p>
         </div>
+        <ThemeToggle />
         <button className="primary" onClick={() => setSharing(true)}>
           Share
         </button>
@@ -192,7 +194,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
             <section key={group.day ?? 'unscheduled'} className="day-group">
               <h2>{group.label}</h2>
               {group.items.length === 0 ? (
-                <p className="muted small">Nothing planned yet.</p>
+                <p className="muted small">Nothing here yet — toss in an idea ✨</p>
               ) : (
                 group.items.map((act) => (
                   <ActivityCard

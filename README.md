@@ -28,6 +28,9 @@ like, and the group can see at a glance who's going where — including when you
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
 - **Who's in** — the list of everyone participating. If someone drops out, remove them: their
   "I'm in"s disappear everywhere, but every idea they contributed stays.
+- **Your look** — follows your phone's light/dark setting by default; the 🌗 button switches
+  between light, dark, and follow-device whenever you prefer otherwise. Activity cards carry a
+  color edge per category, so a hike day and a museum day look different at a glance.
 - **Add to calendar** — planned activities have a 📅 button that opens a prefilled Google
   Calendar event (uses the departure time when set, otherwise a sensible window for the time of
   day).

@@ -28,7 +28,10 @@ museum visit, or dinner, including when the group splits up. Live at
 
 ## Stack & architecture
 
-Vite + React + TypeScript, plain CSS (`src/styles.css`, light/dark via `prefers-color-scheme`).
+Vite + React + TypeScript, plain CSS (`src/styles.css`; warm light/dark palettes — dark applies
+via `prefers-color-scheme` unless the in-app toggle (`src/lib/theme.ts`, `fp.theme` in
+localStorage, `data-theme` on `<html>`) forces one; the two dark variable blocks must stay in
+sync).
 No state-management or UI libraries — keep the dependency count low. Runtime deps beyond React:
 `@noble/curves` (Schnorr signatures for relay events) and `leaflet` (maps — OpenStreetMap tiles
 and Nominatim geocoding, both keyless public OSM infrastructure in the same commodity category as

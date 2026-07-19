@@ -5,6 +5,7 @@ import { extractToken } from '../lib/share';
 import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
 import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
 import { CompassEgg } from './Llama';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Home({
   onOpenTrip,
@@ -46,11 +47,14 @@ export function Home({
   return (
     <div className="page">
       <header className="hero">
+        <div className="hero-top">
+          <ThemeToggle />
+        </div>
         <h1>
           <CompassEgg /> FriendPlanner
         </h1>
         <p className="muted">
-          Plan holiday activities together — no accounts, no servers, everything stays with your group.
+          Plan holiday adventures together — no accounts, no servers, everything stays with your group.
         </p>
       </header>
 

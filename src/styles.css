@@ -1,33 +1,62 @@
 :root {
-  --bg: #f4f5f7;
-  --card: #ffffff;
-  --text: #1c2330;
-  --muted: #67707f;
-  --border: #e2e5ea;
-  --accent: #2563eb;
+  /* Warm, sunny light theme — this is a holiday planner, not a spreadsheet. */
+  --bg: #faf4ea;
+  --card: #fffdf9;
+  --text: #33302b;
+  --muted: #837b6f;
+  --border: #eadfcd;
+  --accent: #0e9488;
   --accent-text: #ffffff;
-  --accent-soft: #dbeafe;
-  --danger: #dc2626;
-  --success: #15803d;
-  --highlight: #fef9c3;
-  --shadow: 0 1px 3px rgb(16 24 40 / 0.08);
-  --radius: 12px;
+  --accent-soft: #d5efe9;
+  --danger: #d64550;
+  --success: #418f4b;
+  --highlight: #fdf0c2;
+  --shadow: 0 1px 3px rgb(122 98 55 / 0.12);
+  --radius: 14px;
+
+  /* Category tints — enough to tell a hike day from a museum day at a glance. */
+  --cat-hike: #6faf4b;
+  --cat-culture: #a86bc9;
+  --cat-food: #e8842c;
+  --cat-beach: #35a7d9;
+  --cat-sport: #e05d3d;
+  --cat-nightlife: #6d74d8;
+  --cat-other: #97a1a8;
 }
 
+/* Warm dark theme: dark plum-brown rather than cold gray-blue. Applied when
+   the device prefers dark (unless the in-app toggle forces light), or when the
+   toggle forces dark — keep both blocks in sync. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #12161d;
-    --card: #1b212b;
-    --text: #e7eaf0;
-    --muted: #9aa4b2;
-    --border: #2a3240;
-    --accent: #3b82f6;
-    --accent-soft: #1e3a5f;
-    --danger: #f87171;
-    --success: #4ade80;
-    --highlight: #3a3417;
+  :root:not([data-theme='light']) {
+    --bg: #221e26;
+    --card: #2d2831;
+    --text: #f0e9df;
+    --muted: #a89e91;
+    --border: #423a45;
+    --accent: #2ec4b0;
+    --accent-text: #10221f;
+    --accent-soft: #1d4a44;
+    --danger: #f27d85;
+    --success: #67c877;
+    --highlight: #46391c;
     --shadow: 0 1px 3px rgb(0 0 0 / 0.4);
   }
+}
+
+:root[data-theme='dark'] {
+  --bg: #221e26;
+  --card: #2d2831;
+  --text: #f0e9df;
+  --muted: #a89e91;
+  --border: #423a45;
+  --accent: #2ec4b0;
+  --accent-text: #10221f;
+  --accent-soft: #1d4a44;
+  --danger: #f27d85;
+  --success: #67c877;
+  --highlight: #46391c;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.4);
 }
 
 * {
@@ -56,8 +85,15 @@ body {
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin: 0;
+}
+
+.theme-toggle {
+  font-size: 1.1rem;
+  padding: 0.35rem 0.5rem;
 }
 
 h2 {
@@ -76,7 +112,12 @@ p {
 
 .hero {
   text-align: center;
-  padding: 1.5rem 0 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .muted {
@@ -325,6 +366,15 @@ footer {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--card) 92%, var(--accent));
 }
+
+/* Category tint: a colored edge, loud enough to scan, quiet enough to ignore. */
+.activity.cat-hike { border-left: 4px solid var(--cat-hike); }
+.activity.cat-culture { border-left: 4px solid var(--cat-culture); }
+.activity.cat-food { border-left: 4px solid var(--cat-food); }
+.activity.cat-beach { border-left: 4px solid var(--cat-beach); }
+.activity.cat-sport { border-left: 4px solid var(--cat-sport); }
+.activity.cat-nightlife { border-left: 4px solid var(--cat-nightlife); }
+.activity.cat-other { border-left: 4px solid var(--cat-other); }
 
 .chip.count {
   color: var(--text);

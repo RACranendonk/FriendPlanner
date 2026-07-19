@@ -43,7 +43,7 @@ export function ActivityCard({
   const link = linkInfo(activity.locationUrl);
 
   return (
-    <article className={`card activity${highlight ? ' popular' : ''}`}>
+    <article className={`card activity cat-${activity.category}${highlight ? ' popular' : ''}`}>
       <div className="activity-main">
         <span className="cat-emoji" title={category.label}>
           {category.emoji}
