@@ -16,6 +16,9 @@ export interface Activity {
   slot: Slot;
   locationName: string;
   locationUrl: string;
+  /** Optional map pin. Absent on activities nobody has located yet (and on pre-map trips). */
+  lat?: number;
+  lng?: number;
   notes: string;
   votes: Record<string, Vote>;
   createdBy: string;

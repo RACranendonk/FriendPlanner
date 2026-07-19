@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Activity, Category, Slot, Trip } from '../types';
 import { CATEGORIES, SLOTS, formatDay, tripDays } from '../types';
+import { geocode, isValidCoords, parseCoordsFromUrl, type LatLng } from '../lib/geo';
+import { MapView } from './MapView';
 
 export function ActivityForm({
   trip,
@@ -23,6 +25,48 @@ export function ActivityForm({
   const [locationUrl, setLocationUrl] = useState(initial?.locationUrl ?? '');
   const [notes, setNotes] = useState(initial?.notes ?? '');
 
+  const initialPin =
+    initial?.lat != null && initial?.lng != null && isValidCoords(initial.lat, initial.lng)
+      ? { lat: initial.lat, lng: initial.lng }
+      : null;
+  const [pin, setPin] = useState<LatLng | null>(initialPin);
+  const [showPicker, setShowPicker] = useState(initialPin !== null);
+  const [finding, setFinding] = useState(false);
+  const [findError, setFindError] = useState('');
+  const pickerPins = useMemo(
+    () => (pin ? [{ id: 'pin', lat: pin.lat, lng: pin.lng, emoji: CATEGORIES[category].emoji }] : []),
+    [pin, category],
+  );
+
+  const handleUrlChange = (value: string) => {
+    setLocationUrl(value);
+    const coords = parseCoordsFromUrl(value);
+    if (coords && !pin) {
+      setPin(coords);
+      setShowPicker(true);
+    }
+  };
+
+  const findOnMap = async () => {
+    setFinding(true);
+    setFindError('');
+    let found = parseCoordsFromUrl(locationUrl);
+    if (!found) {
+      const query = locationName.trim() || title.trim();
+      if (query) {
+        try {
+          found = await geocode(query);
+        } catch {
+          found = null;
+        }
+      }
+    }
+    setFinding(false);
+    setShowPicker(true);
+    if (found) setPin(found);
+    else setFindError("Couldn't find that place — tap the map to set the pin yourself.");
+  };
+
   const submit = () => {
     if (!title.trim()) return;
     onSave({
@@ -33,6 +77,8 @@ export function ActivityForm({
       slot,
       locationName: locationName.trim(),
       locationUrl: locationUrl.trim(),
+      lat: pin?.lat,
+      lng: pin?.lng,
       notes: notes.trim(),
       votes: initial?.votes ?? (me ? { [me]: { in: true, ts: Date.now() } } : {}),
       createdBy: initial?.createdBy ?? me,
@@ -95,9 +141,35 @@ export function ActivityForm({
             value={locationUrl}
             placeholder="https://…"
             inputMode="url"
-            onChange={(e) => setLocationUrl(e.target.value)}
+            onChange={(e) => handleUrlChange(e.target.value)}
           />
         </label>
+        <div className="field">
+          <span>Map pin {pin ? '— set 📍' : '(optional, shows on the trip map)'}</span>
+          <div className="row">
+            <button
+              disabled={finding || (!locationName.trim() && !title.trim() && !locationUrl.trim())}
+              onClick={findOnMap}
+            >
+              {finding ? 'Searching…' : '📍 Find on map'}
+            </button>
+            <button className="ghost" onClick={() => setShowPicker((v) => !v)}>
+              {showPicker ? 'Hide map' : 'Place pin manually'}
+            </button>
+            {pin && (
+              <button className="ghost danger" onClick={() => setPin(null)}>
+                Remove pin
+              </button>
+            )}
+          </div>
+          {findError && <p className="error">{findError}</p>}
+          {showPicker && (
+            <>
+              <MapView pins={pickerPins} onPick={(lat, lng) => setPin({ lat, lng })} height={260} />
+              <p className="muted small">Tap the map to {pin ? 'move' : 'place'} the pin.</p>
+            </>
+          )}
+        </div>
         <label className="field">
           <span>Notes</span>
           <textarea

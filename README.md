@@ -12,7 +12,11 @@ read.
 0. Curious first? **"Try a demo trip"** on the home screen loads a sample plan with fictional
    friends — safe to edit and delete, and it behaves like any real trip (sync included).
 1. One person creates a trip and picks a **group passphrase** (share it in person or in your chat).
-2. Add activities: what, which day, morning/afternoon/evening, a Google Maps or Komoot link, notes.
+2. Add activities: what, which day, morning/afternoon/evening, a link (Komoot, tickets, website —
+   shown labeled by where it leads), notes, and optionally a **map pin**: paste a Google Maps
+   link, hit "Find on map", or tap the map to place it.
+2a. The **trip map** shows every pinned activity together, so you can see where everything is
+   relative to everything else — tap a pin for the activity, its day, and who's going.
 3. Everyone taps **"I'm in"** on the activities they want to join. If someone drops out of the
    trip, remove them from the **"Who's in"** list — their participation disappears everywhere,
    but every activity they suggested stays in the plan.
@@ -49,5 +53,8 @@ Built with Vite + React + TypeScript. Pushing to `main` deploys to GitHub Pages 
   manual link sharing always works as fallback.
 - Relays see connection metadata (your IP, update timestamps, blob size) but never plan content,
   names, or who's in the group.
+- Maps are drawn from OpenStreetMap tiles and places are looked up via Nominatim (OSM's free
+  geocoder) — like any map site, those servers see your IP and the searched place names, but
+  never trip content, notes, or people.
 - Clearing browser data deletes your local copy; rejoin via any shared link or wait for a friend's
   next sync.

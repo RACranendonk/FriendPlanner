@@ -29,7 +29,10 @@ museum visit, or dinner, including when the group splits up. Live at
 ## Stack & architecture
 
 Vite + React + TypeScript, plain CSS (`src/styles.css`, light/dark via `prefers-color-scheme`).
-No state-management or UI libraries — keep the dependency count low.
+No state-management or UI libraries — keep the dependency count low. Runtime deps beyond React:
+`@noble/curves` (Schnorr signatures for relay events) and `leaflet` (maps — OpenStreetMap tiles
+and Nominatim geocoding, both keyless public OSM infrastructure in the same commodity category as
+the relays).
 
 - `src/types.ts` — `Trip`/`Activity`/`Vote` model plus category/slot constants and date helpers.
   Votes are per-person `{in, ts}` records so merges keep each person's latest choice.
@@ -45,6 +48,14 @@ No state-management or UI libraries — keep the dependency count low.
 - `src/lib/useTripSync.ts` — React hook wrapping `TripSync`; no-op without a stored passphrase.
 - `src/lib/merge.ts` — merges two copies of a trip: newer activity edit wins, votes merge
   per-person by timestamp, deletions survive via tombstones (`deleted: true`, never hard-remove).
+- `src/lib/grouping.ts` — trip-view day grouping: unscheduled bucket first, popularity-first sort
+  within a group, unique-winner `topId` for the subtle highlight.
+- `src/lib/linkinfo.ts` — labels activity links by target site (Komoot/Google Maps/…, hostname
+  fallback); normalizes bare domains to https and rejects non-web schemes.
+- `src/lib/geo.ts` — coordinate parsing from Google Maps URLs, Nominatim geocoding. Pins live as
+  optional `lat`/`lng` on Activity, so they sync like any other field.
+- `src/components/MapView.tsx` — Leaflet wrapper (emoji divIcon pins, safe DOM-built popups,
+  optional tap-to-pick). Used by the trip map, the card mini-map, and the form's pin picker.
 - `src/lib/participation.ts` — who's-in listing and merge-safe withdrawal (in:false tombstone
   votes, never entry deletion — see the merge-safety comment there before changing it).
 - `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).

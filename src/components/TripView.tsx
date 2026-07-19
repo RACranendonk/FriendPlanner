@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
 import type { Activity, Trip } from '../types';
-import { formatDay } from '../types';
-import { groupActivities } from '../lib/grouping';
+import { CATEGORIES, SLOTS, formatDay } from '../types';
+import { goingNames, groupActivities } from '../lib/grouping';
+import { MapView, type MapPin } from './MapView';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
 import { listParticipants, withdrawParticipation } from '../lib/participation';
@@ -33,6 +34,23 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   });
 
   const groups = useMemo(() => (trip ? groupActivities(trip) : []), [trip]);
+  const [showTripMap, setShowTripMap] = useState(false);
+  const pins = useMemo<MapPin[]>(
+    () =>
+      (trip?.activities ?? [])
+        .filter((a) => !a.deleted && a.lat != null && a.lng != null)
+        .map((a) => ({
+          id: a.id,
+          lat: a.lat!,
+          lng: a.lng!,
+          emoji: CATEGORIES[a.category].emoji,
+          title: a.title,
+          subtitle:
+            `${a.day ? formatDay(a.day) : 'Sometime during the trip'} · ${SLOTS[a.slot]}` +
+            (goingNames(a).length > 0 ? ` · ${goingNames(a).join(', ')}` : ''),
+        })),
+    [trip],
+  );
 
   if (!trip) {
     return (
@@ -117,6 +135,23 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           </label>
         </section>
       )}
+
+      <section className="card">
+        <div className="section-head">
+          <h2>Trip map</h2>
+          <button className="ghost" onClick={() => setShowTripMap((v) => !v)}>
+            {showTripMap ? 'Hide' : `Show map (${pins.length} pinned)`}
+          </button>
+        </div>
+        {showTripMap &&
+          (pins.length > 0 ? (
+            <MapView pins={pins} height={380} />
+          ) : (
+            <p className="muted small">
+              No pinned activities yet — use "Find on map" when adding or editing an activity.
+            </p>
+          ))}
+      </section>
 
       {participants.length > 0 && (
         <section className="card">
