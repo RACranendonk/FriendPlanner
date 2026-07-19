@@ -15,6 +15,17 @@ describe('createDemoTrip', () => {
     }
   });
 
+  it('demos the newer mechanics: comments, a departure time, and a stays race', () => {
+    const trip = createDemoTrip();
+    expect(trip.activities.some((a) => (a.comments ?? []).length > 0)).toBe(true);
+    expect(trip.activities.some((a) => a.time)).toBe(true);
+    expect(trip.stays!.length).toBeGreaterThanOrEqual(2);
+    expect(trip.stays!.every((s) => !s.deleted)).toBe(true);
+    expect(trip.stays!.some((s) => s.comments.length > 0)).toBe(true);
+    const voteCounts = trip.stays!.map((s) => Object.values(s.votes).filter((v) => v.in).length);
+    expect(Math.max(...voteCounts)).toBeGreaterThan(Math.min(...voteCounts));
+  });
+
   it('gives every generated trip a fresh identity so demo trips never sync into each other', () => {
     expect(createDemoTrip().id).not.toBe(createDemoTrip().id);
   });
