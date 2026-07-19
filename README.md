@@ -35,8 +35,9 @@ like, and the group can see at a glance who's going where — including when you
 ## Getting started
 
 1. One person opens the app, creates the trip, and picks a **group passphrase**.
-2. Hit **Share** and paste the link in your group chat, and tell everyone the passphrase
-   (in person, or however you like).
+2. Hit **Share** and paste the short invite link in your group chat, and tell everyone the
+   passphrase (in person, or however you like). The Share dialog also offers a longer "backup
+   link" that carries the whole plan inside it — a good safety copy for the chat now and then.
 3. Friends open the link, enter their name and the passphrase — that's it, no account, nothing to
    install. Everyone can now add ideas, vote, and edit.
 4. On the trip, check the app at breakfast: the day's plan, who's joining what, and the map are

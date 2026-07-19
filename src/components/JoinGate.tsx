@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { tokenToTrip } from '../lib/share';
+import { inviteTripId, isInviteToken, tokenToTrip } from '../lib/share';
+import { fetchLatestTrip } from '../lib/sync';
 import { mergeTrips } from '../lib/merge';
 import { getName, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
 import { CompassEgg } from './Llama';
@@ -22,7 +23,18 @@ export function JoinGate({
     setBusy(true);
     setError('');
     try {
-      const incoming = await tokenToTrip(token, passphrase);
+      let incoming;
+      if (isInviteToken(token)) {
+        incoming = await fetchLatestTrip(inviteTripId(token), passphrase);
+        if (!incoming) {
+          setError(
+            "Couldn't fetch this plan. Double-check the passphrase with your group — and if it's right, ask them for a full backup link instead (Share → Backup link).",
+          );
+          return;
+        }
+      } else {
+        incoming = await tokenToTrip(token, passphrase);
+      }
       const local = loadTrip(incoming.id);
       const merged = local ? mergeTrips(local, incoming) : incoming;
       saveTrip(merged);
@@ -61,7 +73,7 @@ export function JoinGate({
         {error && <p className="error">{error}</p>}
         <div className="row">
           <button className="primary" disabled={!passphrase || busy} onClick={submit}>
-            {busy ? 'Unlocking…' : 'Unlock plan'}
+            {busy ? (isInviteToken(token) ? 'Fetching plan…' : 'Unlocking…') : 'Unlock plan'}
           </button>
           <button className="ghost" onClick={onCancel}>
             Cancel

@@ -15,6 +15,78 @@ const PUBLISH_DEBOUNCE_MS = 1200;
 const MAX_RECONNECT_MS = 30_000;
 
 /**
+ * One-shot fetch of a trip's latest state from the relays — the invite-link
+ * join path. Collects verified events from every relay until each has sent
+ * EOSE (or the timeout hits), keeps the newest, and decrypts it. Null means
+ * "nothing usable": possibly no data, possibly a wrong passphrase — a wrong
+ * passphrase derives a different pubkey, which simply finds no events, so the
+ * two are indistinguishable by design and the caller's error copy must cover
+ * both.
+ */
+export function fetchLatestTrip(tripId: string, passphrase: string, timeoutMs = 8000): Promise<Trip | null> {
+  return new Promise((resolve) => {
+    let best: NostrEvent | null = null;
+    let pending = RELAYS.length;
+    let done = false;
+    const sockets: WebSocket[] = [];
+
+    const finish = async () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      for (const ws of sockets) ws.close();
+      if (!best) return resolve(null);
+      try {
+        const trip = await tokenToTrip(best.content, passphrase);
+        resolve(trip.id === tripId ? trip : null);
+      } catch {
+        resolve(null);
+      }
+    };
+    const timer = setTimeout(() => void finish(), timeoutMs);
+    const settle = () => {
+      pending--;
+      if (pending <= 0) void finish();
+    };
+
+    void deriveTripKeys(tripId, passphrase).then((keys) => {
+      if (done) return;
+      for (const url of RELAYS) {
+        let ws: WebSocket;
+        try {
+          ws = new WebSocket(url);
+        } catch {
+          settle();
+          continue;
+        }
+        sockets.push(ws);
+        ws.onopen = () => ws.send(JSON.stringify(tripSubscription('fetch', keys.pubkey)));
+        ws.onerror = () => ws.close();
+        ws.onclose = () => settle();
+        ws.onmessage = async (msg) => {
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(String(msg.data));
+          } catch {
+            return;
+          }
+          if (!Array.isArray(parsed) || parsed[1] !== 'fetch') return;
+          if (parsed[0] === 'EOSE') {
+            ws.close();
+            return;
+          }
+          if (parsed[0] !== 'EVENT') return;
+          const event = parsed[2] as NostrEvent;
+          if (await verifyTripEvent(event, keys.pubkey)) {
+            if (!best || event.created_at > best.created_at) best = event;
+          }
+        };
+      }
+    });
+  });
+}
+
+/**
  * Keeps one trip in sync through the public relays: subscribes for the latest
  * encrypted event, hands verified+decrypted trips to `onRemote`, and publishes
  * local changes (debounced, to every connected relay). Reconnects with backoff.

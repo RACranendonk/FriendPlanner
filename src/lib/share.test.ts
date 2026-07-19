@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractToken, tokenToTrip, tripToToken } from './share';
+import { extractToken, inviteToken, inviteTripId, isInviteToken, tokenToTrip, tripToToken } from './share';
 import type { Trip } from '../types';
 
 const trip: Trip = {
@@ -28,5 +28,14 @@ describe('share tokens', () => {
   it('accepts a bare token and rejects text without one', () => {
     expect(extractToken('FP1_abc-DEF_123')).toBe('FP1_abc-DEF_123');
     expect(extractToken('no token in here')).toBeNull();
+  });
+
+  it('builds and recognizes short invite tokens', () => {
+    const token = inviteToken('trip-1');
+    expect(token).toBe('FPJ_trip-1');
+    expect(isInviteToken(token)).toBe(true);
+    expect(isInviteToken('FP1_abc')).toBe(false);
+    expect(inviteTripId(token)).toBe('trip-1');
+    expect(extractToken(`join us! https://example.app/#${token} 🎉`)).toBe(token);
   });
 });

@@ -221,7 +221,14 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
         />
       )}
 
-      {sharing && <ShareDialog trip={trip} onMerged={update} onClose={() => setSharing(false)} />}
+      {sharing && (
+        <ShareDialog
+          trip={trip}
+          onMerged={update}
+          onEnsurePublished={() => sync.publish(trip)}
+          onClose={() => setSharing(false)}
+        />
+      )}
     </div>
   );
 }
