@@ -1,60 +1,65 @@
 # 🧭 FriendPlanner
 
-Plan holiday activities with your friend group — hikes, museums, dinners — and see who joins what,
-even when the group splits up.
+**Plan holiday activities with your friend group — no accounts, no sign-ups, no company storing
+your data.**
 
-**No accounts. No server of our own. No readable data anywhere.** The plan lives in your own
-browser; syncing happens through encrypted blobs that only people with the group passphrase can
-read.
+Live at **https://racranendonk.github.io/FriendPlanner/** · Curious? Hit **"Try a demo trip"** on
+the home screen for a ready-made sample you can safely poke around in.
 
-## How it works
+Some of you want to hike, others want museums, and half the group decides at breakfast.
+FriendPlanner keeps the plan in one place: everyone sees the ideas, taps **"I'm in"** on what they
+like, and the group can see at a glance who's going where — including when you split up.
 
-0. Curious first? **"Try a demo trip"** on the home screen loads a sample plan with fictional
-   friends — safe to edit and delete, and it behaves like any real trip (sync included).
-1. One person creates a trip and picks a **group passphrase** (share it in person or in your chat).
-2. Add activities: what, which day, morning/afternoon/evening, a link (Komoot, tickets, website —
-   shown labeled by where it leads), notes, and optionally a **map pin**: paste a Google Maps
-   link, hit "Find on map", or tap the map to place it.
-2a. The **trip map** shows every pinned activity together, so you can see where everything is
-   relative to everything else — tap a pin for the activity, its day, and who's going.
-3. Everyone taps **"I'm in"** on the activities they want to join. If someone drops out of the
-   trip, remove them from the **"Who's in"** list — their participation disappears everywhere,
-   but every activity they suggested stays in the plan.
-4. Hit **Share** — the app packs the entire plan into one encrypted link. Paste it in the group
-   chat **once**: friends open it and enter the passphrase to join the trip.
-5. From then on, changes sync automatically: live while the page is open, or on the next refresh.
-   Concurrent edits merge (newer edit wins, participant lists combine, deletions stick).
+## What's in it
 
-Syncing works by publishing the end-to-end-encrypted plan (AES-GCM, key derived from the
-passphrase with PBKDF2) to a handful of free public relay servers (the open
-[Nostr](https://nostr.com) relay network). Relays only ever store ciphertext they cannot read, and
-updates are signed with a key derived from the trip + passphrase, so relays can't tamper with or
-forge a plan — only passphrase holders can. Every device keeps the full plan in localStorage; the
-relays are just the messenger, and the share-link flow keeps working as a fallback if they're
-unreachable (the link's `#…` part is never sent to any server).
+- **Trips** — a name, a destination, a date range, and one shared passphrase for the group.
+- **Activities** — title, category (🥾 hike, 🏛️ culture, 🍽️ food, 🏖️ beach, 🚵 sport,
+  🌙 nightlife), day and time of day, notes, a place, and a link (Komoot, tickets, a website —
+  shown labeled by where it leads, so a tap never surprises).
+- **Voting** — tap "I'm in" to join an activity. Every card shows who's going and a count; the
+  most popular activity floats to the top of each day and a clear winner gets a highlighted card.
+- **Ideas pile** — activities without a day yet sit at the top of the plan: they're the ones that
+  still need a decision.
+- **Trip map** — pin activities to a map (paste a Google Maps link, use "Find on map", or tap to
+  place the pin) and see every pin together: tap one for the activity, its day, and who's going.
+- **Who's in** — the list of everyone participating. If someone drops out, remove them: their
+  "I'm in"s disappear everywhere, but every idea they contributed stays.
+- **Live sharing** — invite the group with one link and the plan stays in sync by itself:
+  open tabs update within seconds, otherwise the next refresh catches up. Simultaneous edits
+  merge sensibly (adding never conflicts; votes are per-person; deletions stick).
 
-## Development
+## Getting started
 
-```sh
-npm install
-npm run dev      # local dev server
-npm test         # unit tests (crypto, share tokens, merge logic)
-npm run build    # type-check + production build in dist/
-```
+1. One person opens the app, creates the trip, and picks a **group passphrase**.
+2. Hit **Share** and paste the link in your group chat, and tell everyone the passphrase
+   (in person, or however you like).
+3. Friends open the link, enter their name and the passphrase — that's it, no account, nothing to
+   install. Everyone can now add ideas, vote, and edit.
+4. On the trip, check the app at breakfast: the day's plan, who's joining what, and the map are
+   always current.
 
-Built with Vite + React + TypeScript. Pushing to `main` deploys to GitHub Pages via
-`.github/workflows/deploy.yml` (set the repo's Pages source to "GitHub Actions" once).
+## Privacy & security
 
-## Caveats
+FriendPlanner is built so that **nobody — including the people running the app — can read your
+plans**:
 
-- Everything is only as secure as the passphrase — pick a phrase outsiders can't guess.
-- Public relays are best-effort infrastructure: they may be slow, drop old data, or disappear.
-  That's fine — every device holds the full plan and re-seeds the relays on the next edit, and
-  manual link sharing always works as fallback.
-- Relays see connection metadata (your IP, update timestamps, blob size) but never plan content,
-  names, or who's in the group.
-- Maps are drawn from OpenStreetMap tiles and places are looked up via Nominatim (OSM's free
-  geocoder) — like any map site, those servers see your IP and the searched place names, but
-  never trip content, notes, or people.
-- Clearing browser data deletes your local copy; rejoin via any shared link or wait for a friend's
-  next sync.
+- The plan lives in your own browser on your own device. There is no FriendPlanner server and no
+  account anywhere.
+- Syncing works by passing around an **end-to-end encrypted** copy of the plan (AES-GCM, key
+  derived from your group passphrase). It travels through public relay servers that only ever see
+  unreadable ciphertext — and cryptographically *cannot* alter or fake a plan, only deliver it.
+- Share links carry the encrypted plan in the part after `#`, which browsers never send to any
+  server.
+- The map is drawn from OpenStreetMap; like any map site, their servers see your IP and searched
+  place names — but never your plans, notes, or names.
+- Everything stands or falls with the passphrase: pick one outsiders can't guess, and share it
+  only with the group.
+
+## Good to know
+
+- Clearing your browser data deletes your local copy — rejoin with any shared link, or simply
+  wait for the next sync from a friend.
+- The public relays are best-effort infrastructure. If they're ever unreachable, nothing is lost:
+  every device holds the full plan, and the Share dialog's link flow works as a manual fallback.
+- Editing the *same* activity at the same moment: the newer edit wins. Adding, voting, and
+  deleting never conflict.

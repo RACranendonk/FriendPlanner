@@ -98,9 +98,11 @@ validation is the actual gate (CI double-checks after the fact):
 2. **New feature → add or extend tests that actually exercise it**, and check whether
    `.github/workflows/deploy.yml` needs updating. CI passing must mean the new code was actually
    checked — a green pipeline that never touches the new feature is a false signal.
-3. **Any change that affects usage or behavior → update `README.md` in the same commit.** The
-   README is the user-facing documentation; it goes stale silently if it isn't part of the
-   definition of done. Purely internal refactors don't need it.
+3. **Every significant change to the app → update `README.md` in the same commit.** The README
+   is purely user-facing (what the app does, how a group uses it, the privacy model) — it
+   deliberately has **no development chapter**; dev commands and architecture live here in
+   CLAUDE.md. Keep it accurate to what the deployed page actually does; it goes stale silently
+   if it isn't part of the definition of done. Purely internal refactors don't need it.
 4. Commit with clear, descriptive messages explaining *why*, not just what, and **reference the
    issue** (`Refs #N`, or `Closes #N` once the feature is complete).
 5. **Re-run tests and build right before pushing** (not just before the first commit), then push
