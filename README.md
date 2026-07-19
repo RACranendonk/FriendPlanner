@@ -76,6 +76,29 @@ plans**:
 - Everything stands or falls with the passphrase: pick one outsiders can't guess, and share it
   only with the group.
 
+## How the plan travels
+
+There's no FriendPlanner server — so how does your edit show up on everyone else's phone?
+
+- **Your device is the source of truth.** The complete plan lives in your own browser. The app
+  always shows your local copy, so it opens instantly and works even with no connection at all.
+- **Changes travel as sealed envelopes.** When you change something, your browser encrypts the
+  whole plan using the group passphrase and sends the resulting unreadable blob to a handful of
+  public **Nostr relays** — open message-relay servers on the internet that anyone can use, a bit
+  like leaving a locked box at a few post offices. The app never trusts them with anything
+  readable.
+- **The group listens at the same mailbox.** The passphrase also determines the trip's address on
+  those relays. Everyone else's device watches that address, picks up the newest envelope, opens
+  it with the passphrase, and merges it into their own copy — that's the whole sync.
+- **Relays can't read, fake, or tamper — only deliver.** Every update is signed with a key that
+  can only be derived from the passphrase, and every device checks that signature before
+  accepting anything. A misbehaving relay could at worst be offline or lose data; it can never
+  read your plan or slip in a fake one.
+- **Invite links work the same way, without the relays.** A share link carries an encrypted copy
+  of the plan in the part after `#`, which your browser never sends to any server — the recipient
+  unlocks it with the passphrase. So even if every relay disappeared, the plan still lives on
+  every device and can still be passed around by link.
+
 ## Good to know
 
 - Clearing your browser data deletes your local copy — rejoin with any shared link, or simply
