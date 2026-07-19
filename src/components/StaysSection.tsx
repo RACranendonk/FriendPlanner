@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Stay, Trip } from '../types';
 import { linkInfo } from '../lib/linkinfo';
 import { CommentThread } from './CommentThread';
-import { RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
+import { RATING_CLEARED, RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
 
 /**
  * Accommodation candidates: share options, vote, argue in comments, crown a
@@ -22,15 +22,26 @@ export function StaysSection({
 }) {
   const [editing, setEditing] = useState<Stay | 'new' | null>(null);
 
-  const stays = (trip.stays ?? [])
-    .filter((s) => !s.deleted)
-    .sort(
-      (a, b) =>
-        (b.decided ? 1 : 0) - (a.decided ? 1 : 0) ||
-        (averageRating(b) ?? -1) - (averageRating(a) ?? -1) ||
-        Object.keys(effectiveRatings(b)).length - Object.keys(effectiveRatings(a)).length ||
-        a.title.localeCompare(b.title),
-    );
+  const visible = (trip.stays ?? []).filter((s) => !s.deleted);
+  const bySortValue = (a: Stay, b: Stay) =>
+    (b.decided ? 1 : 0) - (a.decided ? 1 : 0) ||
+    (averageRating(b) ?? -1) - (averageRating(a) ?? -1) ||
+    Object.keys(effectiveRatings(b)).length - Object.keys(effectiveRatings(a)).length ||
+    a.title.localeCompare(b.title);
+
+  // The order is frozen when the section opens: a rating mustn't shuffle the
+  // card someone is looking at. Fresh sort on the next visit/refresh; stays
+  // that appear mid-session go to the end.
+  const orderRef = useRef<Map<string, number> | null>(null);
+  if (orderRef.current === null) {
+    orderRef.current = new Map([...visible].sort(bySortValue).map((s, i) => [s.id, i]));
+  }
+  const frozenIndex = orderRef.current;
+  const stays = [...visible].sort((a, b) => {
+    const ia = frozenIndex.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+    const ib = frozenIndex.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+    return ia - ib || a.createdBy.localeCompare(b.createdBy) || bySortValue(a, b);
+  });
   const anyDecided = stays.some((s) => s.decided);
   // Highlight only a strict favorite: the single stay with the best average.
   const averages = stays.filter((s) => !s.decided).map((s) => averageRating(s)).filter((a): a is number => a !== null);
@@ -43,7 +54,9 @@ export function StaysSection({
 
   const rate = (stay: Stay, score: number) => {
     if (!me) return;
-    // Ratings merge per person like votes — no updatedAt bump.
+    // Ratings merge per person like votes — no updatedAt bump. Clearing writes
+    // score 0 (a tombstone) instead of deleting: a deleted record would be
+    // resurrected by the first merge with an older copy.
     upsert({ ...stay, ratings: { ...(stay.ratings ?? {}), [me]: { score, ts: Date.now() } } });
   };
 
@@ -178,9 +191,9 @@ function StayCard({
             <button
               key={level.score}
               className={`rating-btn${myScore === level.score ? ' selected' : ''}`}
-              title={level.label}
+              title={myScore === level.score ? `${level.label} — tap again to remove your rating` : level.label}
               disabled={!me}
-              onClick={() => onRate(level.score)}
+              onClick={() => onRate(myScore === level.score ? RATING_CLEARED : level.score)}
             >
               {level.emoji}
             </button>

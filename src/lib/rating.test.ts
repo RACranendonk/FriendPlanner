@@ -22,6 +22,14 @@ describe('effectiveRatings', () => {
     expect(effectiveRatings(stay)).toEqual({ Alex: 4 });
   });
 
+  it('treats a cleared rating (score 0) as no opinion, overriding even a legacy vote', () => {
+    const stay = makeStay({
+      votes: { Alex: { in: true, ts: 1 } },
+      ratings: { Alex: { score: 0, ts: 9 }, Dana: { score: 3, ts: 2 } },
+    });
+    expect(effectiveRatings(stay)).toEqual({ Dana: 3 });
+  });
+
   it('lets a real rating override the same person\'s legacy vote', () => {
     const stay = makeStay({
       votes: { Alex: { in: true, ts: 1 } },
