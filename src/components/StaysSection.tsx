@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { Stay, Trip } from '../types';
-import { goingCount, goingNames } from '../lib/grouping';
 import { linkInfo } from '../lib/linkinfo';
 import { CommentThread } from './CommentThread';
+import { RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
 
 /**
  * Accommodation candidates: share options, vote, argue in comments, crown a
@@ -27,20 +27,24 @@ export function StaysSection({
     .sort(
       (a, b) =>
         (b.decided ? 1 : 0) - (a.decided ? 1 : 0) ||
-        goingCount(b) - goingCount(a) ||
+        (averageRating(b) ?? -1) - (averageRating(a) ?? -1) ||
+        Object.keys(effectiveRatings(b)).length - Object.keys(effectiveRatings(a)).length ||
         a.title.localeCompare(b.title),
     );
-  const topVotes = stays.length > 0 ? goingCount(stays.find((s) => !s.decided) ?? stays[0]) : 0;
   const anyDecided = stays.some((s) => s.decided);
+  // Highlight only a strict favorite: the single stay with the best average.
+  const averages = stays.filter((s) => !s.decided).map((s) => averageRating(s)).filter((a): a is number => a !== null);
+  const topAverage = averages.length > 0 ? Math.max(...averages) : null;
+  const topIsUnique = averages.filter((a) => a === topAverage).length === 1;
 
   const upsert = (stay: Stay) => {
     onUpdate({ ...trip, stays: [...(trip.stays ?? []).filter((s) => s.id !== stay.id), stay] });
   };
 
-  const toggleVote = (stay: Stay) => {
+  const rate = (stay: Stay, score: number) => {
     if (!me) return;
-    const currentlyIn = stay.votes[me]?.in ?? false;
-    upsert({ ...stay, votes: { ...stay.votes, [me]: { in: !currentlyIn, ts: Date.now() } } });
+    // Ratings merge per person like votes — no updatedAt bump.
+    upsert({ ...stay, ratings: { ...(stay.ratings ?? {}), [me]: { score, ts: Date.now() } } });
   };
 
   const addComment = (stay: Stay, text: string) => {
@@ -88,8 +92,8 @@ export function StaysSection({
             key={stay.id}
             stay={stay}
             me={me}
-            highlight={!anyDecided && topVotes > 0 && goingCount(stay) === topVotes}
-            onVote={() => toggleVote(stay)}
+            highlight={!anyDecided && topIsUnique && !stay.decided && averageRating(stay) === topAverage}
+            onRate={(score) => rate(stay, score)}
             onComment={(text) => addComment(stay, text)}
             onDecide={() => decide(stay)}
             onEdit={() => setEditing(stay)}
@@ -116,7 +120,7 @@ function StayCard({
   stay,
   me,
   highlight,
-  onVote,
+  onRate,
   onComment,
   onDecide,
   onEdit,
@@ -125,24 +129,26 @@ function StayCard({
   stay: Stay;
   me: string;
   highlight: boolean;
-  onVote: () => void;
+  onRate: (score: number) => void;
   onComment: (text: string) => void;
   onDecide: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
   const link = linkInfo(stay.url);
-  const fans = goingNames(stay);
-  const iLikeIt = me !== '' && fans.includes(me);
+  const ratings = effectiveRatings(stay);
+  const raters = Object.keys(ratings).sort((a, b) => a.localeCompare(b));
+  const average = averageRating(stay);
+  const myScore = me ? ratings[me] : undefined;
 
   return (
     <article className={`card stay${stay.decided ? ' decided' : highlight ? ' popular' : ''}`}>
       <div className="activity-title-row">
         {stay.decided && <span title="The group's choice">🏆</span>}
         <strong>{stay.title}</strong>
-        {fans.length > 0 && (
-          <span className="chip count" title={`${fans.length} in favor`}>
-            👍 {fans.length}
+        {average !== null && (
+          <span className="chip count" title={`Average of ${raters.length} ${raters.length === 1 ? 'rating' : 'ratings'}`}>
+            {ratingEmoji(average)} {average.toFixed(1)}
           </span>
         )}
       </div>
@@ -157,9 +163,9 @@ function StayCard({
       )}
       {stay.details && <p className="small notes">{stay.details}</p>}
       <div className="going-row">
-        {fans.map((person) => (
+        {raters.map((person) => (
           <span key={person} className={`chip person ${person === me ? 'is-me' : ''}`}>
-            {person}
+            {person} {ratingEmoji(ratings[person])}
           </span>
         ))}
       </div>
@@ -167,9 +173,19 @@ function StayCard({
       <CommentThread comments={stay.comments} me={me} onPost={onComment} />
 
       <div className="activity-actions">
-        <button className={iLikeIt ? 'joined' : 'primary'} disabled={!me} onClick={onVote}>
-          {iLikeIt ? "✓ I'd stay here" : "I'd stay here"}
-        </button>
+        <div className="rating-row" title={me ? 'How do you feel about this place?' : 'Enter your name above to rate'}>
+          {RATING_LEVELS.map((level) => (
+            <button
+              key={level.score}
+              className={`rating-btn${myScore === level.score ? ' selected' : ''}`}
+              title={level.label}
+              disabled={!me}
+              onClick={() => onRate(level.score)}
+            >
+              {level.emoji}
+            </button>
+          ))}
+        </div>
         <span className="spacer" />
         <button className="ghost" title={stay.decided ? 'Un-decide' : 'Crown as the choice'} onClick={onDecide}>
           {stay.decided ? 'Un-decide' : '🏆 Decide'}

@@ -39,6 +39,12 @@ export interface Comment {
   ts: number;
 }
 
+/** One person's 1–5 opinion of a stay, timestamped for per-person merging. */
+export interface Rating {
+  score: number;
+  ts: number;
+}
+
 /** An accommodation candidate the group is weighing up. */
 export interface Stay {
   id: string;
@@ -46,7 +52,10 @@ export interface Stay {
   url: string;
   /** Free-text facts: price, beds, distance to town, … (no scraping — entered by hand). */
   details: string;
+  /** Legacy binary votes — superseded by ratings but still merged; in:true reads as a 4. */
   votes: Record<string, Vote>;
+  /** Per-person 1–5 scores. Overrides a person's legacy vote. */
+  ratings?: Record<string, Rating>;
   comments: Comment[];
   /** The crowned choice. LWW via updatedAt like other stay fields. */
   decided?: boolean;

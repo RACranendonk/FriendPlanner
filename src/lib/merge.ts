@@ -1,12 +1,17 @@
 import type { Activity, Comment, Stay, Trip, Vote } from '../types';
 
-function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<string, Vote> {
-  const out: Record<string, Vote> = { ...a };
-  for (const [person, vote] of Object.entries(b)) {
+/** Per-person newest-timestamp merge — votes and ratings share the shape. */
+function mergePerPerson<T extends { ts: number }>(a: Record<string, T>, b: Record<string, T>): Record<string, T> {
+  const out: Record<string, T> = { ...a };
+  for (const [person, entry] of Object.entries(b)) {
     const existing = out[person];
-    if (!existing || vote.ts > existing.ts) out[person] = vote;
+    if (!existing || entry.ts > existing.ts) out[person] = entry;
   }
   return out;
+}
+
+function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<string, Vote> {
+  return mergePerPerson(a, b);
 }
 
 /**
@@ -31,11 +36,15 @@ function mergeStays(a: Stay[] | undefined, b: Stay[] | undefined): Stay[] {
     }
     const newer = stay.updatedAt >= existing.updatedAt ? stay : existing;
     const older = newer === stay ? existing : stay;
-    byId.set(stay.id, {
+    const merged: Stay = {
       ...newer,
       votes: mergeVotes(older.votes, newer.votes),
       comments: mergeComments(older.comments, newer.comments),
-    });
+    };
+    if (older.ratings || newer.ratings) {
+      merged.ratings = mergePerPerson(older.ratings ?? {}, newer.ratings ?? {});
+    }
+    byId.set(stay.id, merged);
   }
   return [...byId.values()];
 }

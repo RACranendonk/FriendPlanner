@@ -27,8 +27,9 @@ describe('createDemoTrip', () => {
     expect(trip.groceries!.some((g) => g.done)).toBe(true);
     expect(trip.groceries!.some((g) => !g.done)).toBe(true);
     expect(trip.groceries!.every((g) => !g.deleted && g.addedBy !== '')).toBe(true);
-    const voteCounts = trip.stays!.map((s) => Object.values(s.votes).filter((v) => v.in).length);
-    expect(Math.max(...voteCounts)).toBeGreaterThan(Math.min(...voteCounts));
+    const allScores = trip.stays!.flatMap((s) => Object.values(s.ratings ?? {}).map((r) => r.score));
+    expect(allScores.length).toBeGreaterThan(0);
+    expect(Math.max(...allScores)).toBeGreaterThan(Math.min(...allScores));
   });
 
   it('gives every generated trip a fresh identity so demo trips never sync into each other', () => {

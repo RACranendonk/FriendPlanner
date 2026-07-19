@@ -1,4 +1,4 @@
-import type { Activity, BringItem, Comment, GroceryItem, Stay, Trip, Vote } from '../types';
+import type { Activity, BringItem, Comment, GroceryItem, Rating, Stay, Trip, Vote } from '../types';
 
 // The sample friends (Alex, Billie, Charlie, Dana) are deliberately fictional —
 // never real names from anyone's group.
@@ -12,6 +12,13 @@ function votes(...entries: Array<[string, boolean]>): Record<string, Vote> {
   const out: Record<string, Vote> = {};
   let ts = Date.now() - 86_400_000;
   for (const [name, isIn] of entries) out[name] = { in: isIn, ts: (ts += 60_000) };
+  return out;
+}
+
+function ratings(...entries: Array<[string, number]>): Record<string, Rating> {
+  const out: Record<string, Rating> = {};
+  let ts = Date.now() - 80_000_000;
+  for (const [name, score] of entries) out[name] = { score, ts: (ts += 60_000) };
   return out;
 }
 
@@ -218,7 +225,8 @@ function demoStays(now: number): Stay[] {
         title: 'Agriturismo with pool near Greve',
         url: 'https://www.airbnb.com/s/Greve-in-Chianti--Italy/homes',
         details: '€38 pp/night · 6 beds · pool · 40 min drive to Florence',
-        votes: votes(['Alex', true], ['Billie', true], ['Dana', true]),
+        votes: {},
+        ratings: ratings(['Alex', 5], ['Billie', 5], ['Dana', 4], ['Charlie', 2]),
         comments: comments(
           ['Billie', 'That pool though 😍'],
           ['Charlie', 'And how do we get home after a night out?'],
@@ -233,7 +241,8 @@ function demoStays(now: number): Stay[] {
         title: 'Apartment in Florence centre',
         url: 'https://www.booking.com/city/it/florence.html',
         details: '€45 pp/night · 5 beds · everything walkable',
-        votes: votes(['Charlie', true]),
+        votes: {},
+        ratings: ratings(['Charlie', 5], ['Dana', 2], ['Alex', 3]),
         comments: comments(['Charlie', 'We can stumble home from anywhere'], ['Dana', 'No pool, no deal 🏊']),
         createdBy: 'Charlie',
       },
@@ -244,7 +253,8 @@ function demoStays(now: number): Stay[] {
         title: 'Villa with own vineyard, San Gimignano',
         url: 'https://www.airbnb.com/s/San-Gimignano--Italy/homes',
         details: '€52 pp/night · 8 beds · vineyard(!) · quite remote',
-        votes: votes(['Dana', true]),
+        votes: {},
+        ratings: ratings(['Dana', 5], ['Billie', 3], ['Charlie', 2]),
         comments: comments(['Dana', 'It. Has. A. Vineyard.']),
         createdBy: 'Dana',
       },

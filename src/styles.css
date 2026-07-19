@@ -548,6 +548,33 @@ footer {
   background: color-mix(in srgb, var(--card) 92%, var(--success));
 }
 
+.rating-row {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.rating-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.25rem 0.35rem;
+  font-size: 1.15rem;
+  filter: grayscale(0.7);
+  opacity: 0.75;
+}
+
+.rating-btn:hover:not(:disabled) {
+  filter: none;
+  opacity: 1;
+}
+
+.rating-btn.selected {
+  filter: none;
+  opacity: 1;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .comment {
   margin: 0.15rem 0;
   padding-left: 0.5rem;

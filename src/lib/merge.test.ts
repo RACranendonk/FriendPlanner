@@ -224,6 +224,15 @@ describe('mergeTrips: stays', () => {
     expect(Object.keys(merged.votes).sort()).toEqual(['Alex', 'Billie']);
   });
 
+  it('merges ratings per person by timestamp', () => {
+    const local = makeTrip({ stays: [makeStay({ ratings: { Alex: { score: 5, ts: 5 } } })] });
+    const incoming = makeTrip({
+      stays: [makeStay({ ratings: { Alex: { score: 2, ts: 9 }, Billie: { score: 4, ts: 1 } } })],
+    });
+    const merged = mergeTrips(local, incoming).stays![0];
+    expect(merged.ratings).toEqual({ Alex: { score: 2, ts: 9 }, Billie: { score: 4, ts: 1 } });
+  });
+
   it('keeps stay deletions via tombstones', () => {
     const local = makeTrip({ stays: [makeStay({ deleted: true, updatedAt: 9 })] });
     const incoming = makeTrip({ stays: [makeStay({ updatedAt: 1 })] });
