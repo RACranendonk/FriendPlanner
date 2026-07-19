@@ -105,6 +105,9 @@ validation is the actual gate (CI double-checks after the fact):
    issue** (`Refs #N`, or `Closes #N` once the feature is complete).
 5. **Re-run tests and build right before pushing** (not just before the first commit), then push
    to `main` and confirm CI comes back green. Close the issue if the commit didn't auto-close it.
+5a. **When an issue is resolved, leave a succinct resolution comment on it** (`gh issue comment`):
+   the commit hash and a short bullet list of the steps taken — what was added/changed where, and
+   how it was validated. The issue thread should tell its own story without opening the diff.
 6. **Meaningful versions get a tagged release**: bump `package.json`'s version, tag `vX.Y.Z`, and
    publish a GitHub release (`gh release create`) with short notes on what changed for users.
    Not every push is a release — a release marks a coherent, tell-the-group-about-it milestone.
