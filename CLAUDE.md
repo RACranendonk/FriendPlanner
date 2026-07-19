@@ -60,6 +60,13 @@ validation is the actual gate (CI double-checks after the fact):
 
 0. **New feature? Open a GitHub issue first** (`gh issue create`), describing what's being built
    and why, before writing code. Small fixes/chores don't need one.
+   - **Label every issue** with its type (`bug`, `enhancement`, `documentation`, `question`, or
+     `research` for investigation-only spikes), add `in progress` while work is actively underway
+     (remove it on close), and add `friend-request` when the idea came from someone in the group —
+     one generic label, never per-person labels or names (see the no-personal-data rule below).
+     `needs-verification` marks issues opened by people outside the group once the repo is public.
+   - **Prefix issue titles with the area** they touch (e.g. `Share:`, `Merge:`, `UI:`, `Docs:`,
+     `Build:`) so the issue list scans at a glance.
 1. Before committing, run `npm test` and `npm run build` locally and confirm both are clean.
 2. **New feature → add or extend tests that actually exercise it**, and check whether
    `.github/workflows/deploy.yml` needs updating. CI passing must mean the new code was actually
@@ -71,6 +78,9 @@ validation is the actual gate (CI double-checks after the fact):
    issue** (`Refs #N`, or `Closes #N` once the feature is complete).
 5. **Re-run tests and build right before pushing** (not just before the first commit), then push
    to `main` and confirm CI comes back green. Close the issue if the commit didn't auto-close it.
+6. **Meaningful versions get a tagged release**: bump `package.json`'s version, tag `vX.Y.Z`, and
+   publish a GitHub release (`gh release create`) with short notes on what changed for users.
+   Not every push is a release — a release marks a coherent, tell-the-group-about-it milestone.
 
 No secrets or personal data in commits: no tokens or API keys, and no real trip data, passphrases,
 or friends' names — tests and docs use clearly fake placeholders.
