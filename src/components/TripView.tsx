@@ -6,7 +6,6 @@ import { MapView, type MapPin } from './MapView';
 import { googleCalendarUrl } from '../lib/calendar';
 import { StaysSection } from './StaysSection';
 import { ThemeToggle } from './ThemeToggle';
-import { Credits } from './Credits';
 import { emptyDayMessage } from '../lib/copy';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
@@ -255,10 +254,6 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           onCancel={() => setEditing(null)}
         />
       )}
-
-      <footer>
-        <Credits />
-      </footer>
 
       {sharing && (
         <ShareDialog
