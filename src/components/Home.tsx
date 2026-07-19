@@ -3,6 +3,7 @@ import type { Trip } from '../types';
 import { formatDay } from '../types';
 import { extractToken } from '../lib/share';
 import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
+import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
 
 export function Home({
   onOpenTrip,
@@ -97,9 +98,23 @@ export function Home({
             onCancel={() => setCreating(false)}
           />
         ) : (
-          <button className="primary" onClick={() => setCreating(true)}>
-            ＋ New trip
-          </button>
+          <div className="row">
+            <button className="primary" onClick={() => setCreating(true)}>
+              ＋ New trip
+            </button>
+            <button
+              className="ghost"
+              title="Loads a sample trip with fictional friends so you can poke around"
+              onClick={() => {
+                const demo = createDemoTrip();
+                saveTrip(demo);
+                setPassphrase(demo.id, DEMO_PASSPHRASE);
+                onOpenTrip(demo.id);
+              }}
+            >
+              Try a demo trip
+            </button>
+          </div>
         )}
       </section>
 

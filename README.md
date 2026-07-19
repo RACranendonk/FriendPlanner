@@ -9,6 +9,8 @@ read.
 
 ## How it works
 
+0. Curious first? **"Try a demo trip"** on the home screen loads a sample plan with fictional
+   friends — safe to edit and delete, and it behaves like any real trip (sync included).
 1. One person creates a trip and picks a **group passphrase** (share it in person or in your chat).
 2. Add activities: what, which day, morning/afternoon/evening, a Google Maps or Komoot link, notes.
 3. Everyone taps **"I'm in"** on the activities they want to join.
