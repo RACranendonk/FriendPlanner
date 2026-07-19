@@ -1,4 +1,4 @@
-import type { Activity, Stay, StayComment, Trip, Vote } from '../types';
+import type { Activity, Comment, Stay, Trip, Vote } from '../types';
 
 function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<string, Vote> {
   const out: Record<string, Vote> = { ...a };
@@ -14,8 +14,8 @@ function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<st
  * newer edit wins, votes are merged per person, deletions survive via tombstones.
  */
 /** Comments are append-only and immutable: merging is a union by id. */
-function mergeComments(a: StayComment[], b: StayComment[]): StayComment[] {
-  const byId = new Map<string, StayComment>();
+function mergeComments(a: Comment[], b: Comment[]): Comment[] {
+  const byId = new Map<string, Comment>();
   for (const c of [...a, ...b]) byId.set(c.id, c);
   return [...byId.values()].sort((x, y) => x.ts - y.ts || x.id.localeCompare(y.id));
 }
@@ -64,7 +64,11 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
     }
     const newer = act.updatedAt >= existing.updatedAt ? act : existing;
     const older = newer === act ? existing : act;
-    byId.set(act.id, { ...newer, votes: mergeVotes(older.votes, newer.votes) });
+    const merged: Activity = { ...newer, votes: mergeVotes(older.votes, newer.votes) };
+    if (older.comments || newer.comments) {
+      merged.comments = mergeComments(older.comments ?? [], newer.comments ?? []);
+    }
+    byId.set(act.id, merged);
   }
   return {
     ...meta,

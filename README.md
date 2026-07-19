@@ -19,6 +19,9 @@ like, and the group can see at a glance who's going where — including when you
   where it leads, so a tap never surprises).
 - **Voting** — tap "I'm in" to join an activity. Every card shows who's going and a count; the
   most popular activity floats to the top of each day and a clear winner gets a highlighted card.
+- **Comments** — every activity and stay option has its own little 💬 thread. Ask "what is
+  this?", get an answer next to the question — nobody has to edit over anyone's notes, and every
+  remark shows who wrote it.
 - **Ideas pile** — activities without a day yet sit at the top of the plan: they're the ones that
   still need a decision.
 - **Where we stay** — before the activities, decide the trip itself: collect accommodation

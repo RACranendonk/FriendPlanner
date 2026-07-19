@@ -4,6 +4,7 @@ import { CATEGORIES, SLOTS } from '../types';
 import { goingNames } from '../lib/grouping';
 import { linkInfo } from '../lib/linkinfo';
 import { MapView } from './MapView';
+import { CommentThread } from './CommentThread';
 
 /**
  * Only a named place gets an inline map snippet. Pasted links (Komoot, venue
@@ -23,6 +24,7 @@ export function ActivityCard({
   highlight,
   calendarUrl,
   onToggle,
+  onComment,
   onEdit,
   onDelete,
 }: {
@@ -31,6 +33,7 @@ export function ActivityCard({
   highlight: boolean;
   calendarUrl: string | null;
   onToggle: () => void;
+  onComment: (text: string) => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
@@ -84,6 +87,7 @@ export function ActivityCard({
             </p>
           )}
           {activity.notes && <p className="small notes">{activity.notes}</p>}
+          <CommentThread comments={activity.comments ?? []} me={me} onPost={onComment} />
           <div className="going-row">
             {going.length > 0 ? (
               going.map((person) => (

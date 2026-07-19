@@ -76,6 +76,22 @@ describe('mergeTrips', () => {
     expect(sameTrip(makeTrip({ activities: [a1] }), makeTrip({ activities: [a1, a2] }))).toBe(false);
   });
 
+  it('unions activity comments from both sides, ordered by time, in both merge directions', () => {
+    const local = makeTrip({
+      activities: [makeActivity({ comments: [{ id: 'c2', author: 'Anna', text: 'The viewpoint one', ts: 5 }] })],
+    });
+    const incoming = makeTrip({
+      activities: [makeActivity({ comments: [{ id: 'c1', author: 'Ben', text: 'What is this?', ts: 2 }] })],
+    });
+    expect(mergeTrips(local, incoming).activities[0].comments!.map((c) => c.id)).toEqual(['c1', 'c2']);
+    expect(mergeTrips(incoming, local).activities[0].comments!.map((c) => c.id)).toEqual(['c1', 'c2']);
+  });
+
+  it('leaves comments absent when neither side has any', () => {
+    const merged = mergeTrips(makeTrip({ activities: [makeActivity()] }), makeTrip({ activities: [makeActivity()] }));
+    expect(merged.activities[0].comments).toBeUndefined();
+  });
+
   it('takes trip metadata from the newer side', () => {
     const local = makeTrip({ name: 'Old name', updatedAt: 1 });
     const incoming = makeTrip({ name: 'Renamed trip', updatedAt: 2 });

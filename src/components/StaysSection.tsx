@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Stay, Trip } from '../types';
 import { goingCount, goingNames } from '../lib/grouping';
 import { linkInfo } from '../lib/linkinfo';
+import { CommentThread } from './CommentThread';
 
 /**
  * Accommodation candidates: share options, vote, argue in comments, crown a
@@ -130,16 +131,9 @@ function StayCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const [commentText, setCommentText] = useState('');
-  const [showComments, setShowComments] = useState(false);
   const link = linkInfo(stay.url);
   const fans = goingNames(stay);
   const iLikeIt = me !== '' && fans.includes(me);
-
-  const submitComment = () => {
-    onComment(commentText);
-    setCommentText('');
-  };
 
   return (
     <article className={`card stay${stay.decided ? ' decided' : highlight ? ' popular' : ''}`}>
@@ -170,32 +164,7 @@ function StayCard({
         ))}
       </div>
 
-      <div className="comments">
-        {stay.comments.length > 0 && (
-          <button className="linklike small" onClick={() => setShowComments((v) => !v)}>
-            {showComments ? 'Hide' : 'Show'} {stay.comments.length}{' '}
-            {stay.comments.length === 1 ? 'comment' : 'comments'}
-          </button>
-        )}
-        {showComments &&
-          stay.comments.map((c) => (
-            <p key={c.id} className="small comment">
-              <strong>{c.author}</strong> {c.text}
-            </p>
-          ))}
-        <div className="share-box">
-          <input
-            value={commentText}
-            placeholder={me ? 'Add a thought…' : 'Enter your name above to comment'}
-            disabled={!me}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && submitComment()}
-          />
-          <button disabled={!me || !commentText.trim()} onClick={submitComment}>
-            Post
-          </button>
-        </div>
-      </div>
+      <CommentThread comments={stay.comments} me={me} onPost={onComment} />
 
       <div className="activity-actions">
         <button className={iLikeIt ? 'joined' : 'primary'} disabled={!me} onClick={onVote}>

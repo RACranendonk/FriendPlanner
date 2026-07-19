@@ -85,6 +85,17 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     upsertActivity({ ...act, votes: { ...act.votes, [person]: { in: !currentlyIn, ts: Date.now() } } });
   };
 
+  const commentOnActivity = (act: Activity, text: string) => {
+    const person = me.trim();
+    if (!person) return;
+    // Like votes, comments merge on their own (append-only union) — no
+    // updatedAt bump, so a question never clobbers a concurrent edit.
+    upsertActivity({
+      ...act,
+      comments: [...(act.comments ?? []), { id: crypto.randomUUID(), author: person, text, ts: Date.now() }],
+    });
+  };
+
   const removeActivity = (act: Activity) => {
     if (!confirm(`Delete "${act.title}" for everyone (after you share the update)?`)) return;
     upsertActivity({ ...act, deleted: true, updatedAt: Date.now() });
@@ -205,6 +216,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
                     highlight={act.id === group.topId}
                     calendarUrl={googleCalendarUrl(trip, act)}
                     onToggle={() => toggleVote(act)}
+                    onComment={(text) => commentOnActivity(act, text)}
                     onEdit={() => setEditing(act)}
                     onDelete={() => removeActivity(act)}
                   />

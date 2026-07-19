@@ -49,8 +49,10 @@ the relays).
 - `src/lib/sync.ts` — `TripSync`: websocket client for the relays (subscribe → verify → decrypt →
   `onRemote`; debounced publish to all connected relays; reconnect with backoff).
 - `src/lib/useTripSync.ts` — React hook wrapping `TripSync`; no-op without a stored passphrase.
-- `src/lib/merge.ts` — merges two copies of a trip: newer activity edit wins, votes merge
-  per-person by timestamp, deletions survive via tombstones (`deleted: true`, never hard-remove).
+- `src/lib/merge.ts` — merges two copies of a trip: newer activity/stay edit wins, votes merge
+  per-person by timestamp, comments (on activities and stays) union append-only by id, deletions
+  survive via tombstones (`deleted: true`, never hard-remove). Stays merge explicitly from both
+  sides so pre-feature copies can't wipe them.
 - `src/lib/grouping.ts` — trip-view day grouping: unscheduled bucket first, popularity-first sort
   within a group, unique-winner `topId` for the subtle highlight.
 - `src/lib/linkinfo.ts` — labels activity links by target site (Komoot/Google Maps/…, hostname

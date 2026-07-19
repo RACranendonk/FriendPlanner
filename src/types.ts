@@ -23,14 +23,16 @@ export interface Activity {
   lng?: number;
   notes: string;
   votes: Record<string, Vote>;
+  /** Discussion thread — notes are for facts, comments for questions and answers. Absent on older activities. */
+  comments?: Comment[];
   createdBy: string;
   updatedAt: number;
   /** Tombstone: kept around so a deletion survives merging with older copies. */
   deleted?: boolean;
 }
 
-/** A remark on a stay option. Append-only and immutable — that's what makes comment merging trivially conflict-free. */
-export interface StayComment {
+/** A remark in an activity's or stay's thread. Append-only and immutable — that's what makes comment merging trivially conflict-free. */
+export interface Comment {
   id: string;
   author: string;
   text: string;
@@ -45,7 +47,7 @@ export interface Stay {
   /** Free-text facts: price, beds, distance to town, … (no scraping — entered by hand). */
   details: string;
   votes: Record<string, Vote>;
-  comments: StayComment[];
+  comments: Comment[];
   /** The crowned choice. LWW via updatedAt like other stay fields. */
   decided?: boolean;
   createdBy: string;
