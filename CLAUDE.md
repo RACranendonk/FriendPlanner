@@ -1,0 +1,79 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+FriendPlanner (remote: `https://github.com/RACranendonk/FriendPlanner`) is a personal side-project:
+a web app for Robert's friend group to plan holiday activities together — who joins which hike,
+museum visit, or dinner, including when the group splits up. Live at
+`https://racranendonk.github.io/FriendPlanner/` once deployed.
+
+## Product invariants — do not violate
+
+- **No backend, ever (for now).** The app is a static site on GitHub Pages. No server storage, no
+  databases, no third-party data services. Robert explicitly does not want responsibility for
+  storing anyone's data.
+- **All state lives client-side**: localStorage for the local copy, and encrypted share-links for
+  sync. The share token travels in the URL *fragment* (`#…`), which browsers never send to servers.
+- **No accounts or login.** Access to a plan is gated only by a pre-shared group passphrase
+  (PBKDF2 → AES-GCM). Only people who know each other in real life share the passphrase.
+- Sync is turn-based by design: edit → share a fresh link in the group chat → friends merge it.
+  Anything fancier (live P2P sync) is a possible future phase, not a reason to add a server.
+
+## Stack & architecture
+
+Vite + React + TypeScript, plain CSS (`src/styles.css`, light/dark via `prefers-color-scheme`).
+No state-management or UI libraries — keep the dependency count low.
+
+- `src/types.ts` — `Trip`/`Activity`/`Vote` model plus category/slot constants and date helpers.
+  Votes are per-person `{in, ts}` records so merges keep each person's latest choice.
+- `src/lib/crypto.ts` — JSON → deflate → AES-GCM (key from passphrase via PBKDF2, fresh salt/iv
+  per token) → base64url. Requires a secure context (localhost or HTTPS; `file://` won't work).
+- `src/lib/share.ts` — `FP1_`-prefixed token pack/unpack, token extraction from pasted text.
+- `src/lib/merge.ts` — merges two copies of a trip: newer activity edit wins, votes merge
+  per-person by timestamp, deletions survive via tombstones (`deleted: true`, never hard-remove).
+- `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).
+- `src/components/` — `Home` (trip list/create/join), `JoinGate` (passphrase entry for a shared
+  link), `TripView` (day-grouped activity list), `ActivityCard`/`ActivityForm`, `ShareDialog`
+  (link generation + merge-an-update). `App.tsx` does hash-based routing: a `#FP1_…` fragment
+  routes to `JoinGate`.
+
+Bumping `updatedAt`: activity edits set it; **vote toggles deliberately don't** (votes carry their
+own timestamps), so a vote never clobbers someone's concurrent edit of the same activity in a merge.
+
+## Commands
+
+```sh
+npm run dev    # dev server at http://localhost:5173/FriendPlanner/
+npm test       # vitest unit tests (src/lib/*.test.ts)
+npm run build  # tsc --noEmit type-check + vite production build
+```
+
+CI/deploy (`.github/workflows/deploy.yml`) runs tests + build on every push to `main` and deploys
+`dist/` to GitHub Pages. It's a backstop, not the primary gate — see below.
+
+## Development workflow
+
+Robert is the sole developer — no branch/PR ceremony, **commit directly to `main`.** Local
+validation is the actual gate (CI double-checks after the fact):
+
+0. **New feature? Open a GitHub issue first** (`gh issue create`), describing what's being built
+   and why, before writing code. Small fixes/chores don't need one.
+1. Before committing, run `npm test` and `npm run build` locally and confirm both are clean.
+2. **New feature → add or extend tests that actually exercise it**, and check whether
+   `.github/workflows/deploy.yml` needs updating. CI passing must mean the new code was actually
+   checked — a green pipeline that never touches the new feature is a false signal.
+3. **Any change that affects usage or behavior → update `README.md` in the same commit.** The
+   README is the user-facing documentation; it goes stale silently if it isn't part of the
+   definition of done. Purely internal refactors don't need it.
+4. Commit with clear, descriptive messages explaining *why*, not just what, and **reference the
+   issue** (`Refs #N`, or `Closes #N` once the feature is complete).
+5. **Re-run tests and build right before pushing** (not just before the first commit), then push
+   to `main` and confirm CI comes back green. Close the issue if the commit didn't auto-close it.
+
+No secrets or personal data in commits: no tokens or API keys, and no real trip data, passphrases,
+or friends' names — tests and docs use clearly fake placeholders.
+
+Code comments: only where the *why* isn't obvious from the code (a non-obvious constraint, a
+workaround, a subtle invariant) — never restating what well-named code already says.
