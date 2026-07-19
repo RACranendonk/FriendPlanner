@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { tokenToTrip } from '../lib/share';
 import { mergeTrips } from '../lib/merge';
 import { getName, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
+import { CompassEgg } from './Llama';
 
 export function JoinGate({
   token,
@@ -38,7 +39,9 @@ export function JoinGate({
   return (
     <div className="page narrow">
       <header className="hero">
-        <h1>🧭 FriendPlanner</h1>
+        <h1>
+          <CompassEgg /> FriendPlanner
+        </h1>
         <p className="muted">A friend shared a trip plan with you. Unlock it with your group's passphrase.</p>
       </header>
       <section className="card form">

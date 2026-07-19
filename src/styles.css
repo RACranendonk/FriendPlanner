@@ -442,6 +442,78 @@ footer {
   order: 99;
 }
 
+/* ---- llama easter egg ---- */
+
+.compass-egg {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.llama {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  font-size: 2.4rem;
+  line-height: 1;
+  animation: llama-walk 7s linear forwards;
+}
+
+/* The emoji faces left, so it strolls right-to-left. */
+@keyframes llama-walk {
+  from {
+    transform: translateX(100vw);
+  }
+  to {
+    transform: translateX(-80px);
+  }
+}
+
+.llama-flip {
+  display: inline-block;
+  animation: llama-flip 0.9s ease-in-out 3.2s 1;
+}
+
+.llama-emoji {
+  display: inline-block;
+  animation: llama-trot 0.4s ease-in-out infinite;
+}
+
+@keyframes llama-flip {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: translateY(-46px) rotate(150deg) scale(1.05, 0.95);
+  }
+  65% {
+    transform: translateY(-50px) rotate(260deg);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+@keyframes llama-trot {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The llama still strolls by, but politely declines to flip. */
+  .llama-flip,
+  .llama-emoji {
+    animation: none;
+  }
+}
+
 /* ---- modal ---- */
 
 .overlay {
