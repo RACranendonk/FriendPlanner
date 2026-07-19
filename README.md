@@ -13,7 +13,9 @@ read.
    friends — safe to edit and delete, and it behaves like any real trip (sync included).
 1. One person creates a trip and picks a **group passphrase** (share it in person or in your chat).
 2. Add activities: what, which day, morning/afternoon/evening, a Google Maps or Komoot link, notes.
-3. Everyone taps **"I'm in"** on the activities they want to join.
+3. Everyone taps **"I'm in"** on the activities they want to join. If someone drops out of the
+   trip, remove them from the **"Who's in"** list — their participation disappears everywhere,
+   but every activity they suggested stays in the plan.
 4. Hit **Share** — the app packs the entire plan into one encrypted link. Paste it in the group
    chat **once**: friends open it and enter the passphrase to join the trip.
 5. From then on, changes sync automatically: live while the page is open, or on the next refresh.

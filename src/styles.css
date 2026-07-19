@@ -364,6 +364,19 @@ footer {
   border-color: var(--accent);
 }
 
+.chip-x {
+  background: none;
+  border: none;
+  padding: 0 0 0 0.35rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chip-x:hover {
+  color: var(--danger);
+}
+
 .activity-actions {
   display: flex;
   align-items: center;

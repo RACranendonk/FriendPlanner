@@ -45,6 +45,8 @@ No state-management or UI libraries — keep the dependency count low.
 - `src/lib/useTripSync.ts` — React hook wrapping `TripSync`; no-op without a stored passphrase.
 - `src/lib/merge.ts` — merges two copies of a trip: newer activity edit wins, votes merge
   per-person by timestamp, deletions survive via tombstones (`deleted: true`, never hard-remove).
+- `src/lib/participation.ts` — who's-in listing and merge-safe withdrawal (in:false tombstone
+  votes, never entry deletion — see the merge-safety comment there before changing it).
 - `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).
 - `src/components/` — `Home` (trip list/create/join), `JoinGate` (passphrase entry for a shared
   link), `TripView` (day-grouped activity list), `ActivityCard`/`ActivityForm`, `ShareDialog`

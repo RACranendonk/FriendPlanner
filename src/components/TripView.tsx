@@ -3,6 +3,7 @@ import type { Activity, Trip } from '../types';
 import { formatDay, tripDays } from '../types';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
+import { listParticipants, withdrawParticipation } from '../lib/participation';
 import { useTripSync } from '../lib/useTripSync';
 import { ActivityCard } from './ActivityCard';
 import { ActivityForm } from './ActivityForm';
@@ -85,6 +86,14 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     setName(value);
   };
 
+  const participants = listParticipants(trip);
+
+  const removeParticipation = (person: string) => {
+    const label = person === me.trim() ? 'Leave all activities you joined?' : `Remove ${person} from everything they joined?`;
+    if (!confirm(`${label} Activities they suggested stay in the plan.`)) return;
+    update(withdrawParticipation(trip, person));
+  };
+
   return (
     <div className="page">
       <header className="trip-header">
@@ -119,6 +128,29 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
             <span>Enter your name to join activities</span>
             <input value={me} placeholder="e.g. Robert" onChange={(e) => saveMyName(e.target.value)} />
           </label>
+        </section>
+      )}
+
+      {participants.length > 0 && (
+        <section className="card">
+          <h2>Who's in</h2>
+          <div className="going-row">
+            {participants.map((person) => (
+              <span key={person} className={`chip person ${person === me.trim() ? 'is-me' : ''}`}>
+                {person}
+                <button
+                  className="chip-x"
+                  title={`Remove ${person}'s participation (their suggestions stay)`}
+                  onClick={() => removeParticipation(person)}
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+          <p className="muted small">
+            Removing someone clears their "I'm in" everywhere — activities they suggested stay in the plan.
+          </p>
         </section>
       )}
 
