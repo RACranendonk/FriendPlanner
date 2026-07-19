@@ -24,9 +24,10 @@ like, and the group can see at a glance who's going where — including when you
   remark shows who wrote it.
 - **Ideas pile** — activities without a day yet sit at the top of the plan: they're the ones that
   still need a decision.
-- **Where we stay** — before the activities, decide the trip itself: collect accommodation
+- **Planning tab** — before the activities, decide the trip itself: collect accommodation
   candidates (Airbnb, Booking, anything with a link), vote "I'd stay here", discuss each option
-  in comments, and crown the winner with a 🏆 when it's settled.
+  in comments, and crown the winner with a 🏆 when it's settled. Lives in its own tab so the
+  activity schedule stays front and center.
 - **Trip map** — pin activities to a map (paste a Google Maps link, use "Find on map", or tap to
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
 - **Who's in** — the list of everyone participating. If someone drops out, remove them: their

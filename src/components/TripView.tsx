@@ -20,6 +20,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   const [me, setMe] = useState(getName());
   const [editing, setEditing] = useState<Activity | 'new' | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [tab, setTab] = useState<'activities' | 'planning'>('activities');
 
   const passphrase = useMemo(() => getPassphrase(tripId), [tripId]);
   const tripRef = useRef(trip);
@@ -152,8 +153,21 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
         </section>
       )}
 
-      <StaysSection trip={trip} me={me.trim()} onUpdate={update} />
+      <nav className="tabs">
+        <button className={tab === 'activities' ? 'active' : ''} onClick={() => setTab('activities')}>
+          Activities
+        </button>
+        <button className={tab === 'planning' ? 'active' : ''} onClick={() => setTab('planning')}>
+          Planning
+          {(trip.stays ?? []).filter((s) => !s.deleted).length > 0 &&
+            ` (${(trip.stays ?? []).filter((s) => !s.deleted).length})`}
+        </button>
+      </nav>
 
+      {tab === 'planning' && <StaysSection trip={trip} me={me.trim()} onUpdate={update} />}
+
+      {tab === 'activities' && (
+        <>
       <section className="card">
         <div className="section-head">
           <h2>Trip map</h2>
@@ -224,6 +238,8 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
               )}
             </section>
           ),
+      )}
+        </>
       )}
 
       {editing && (

@@ -344,6 +344,30 @@ footer {
   min-width: 0;
 }
 
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  background: color-mix(in srgb, var(--card) 55%, var(--bg));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem;
+}
+
+.tabs button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.5rem;
+  color: var(--muted);
+}
+
+.tabs button.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
 .day-group {
   display: flex;
   flex-direction: column;
