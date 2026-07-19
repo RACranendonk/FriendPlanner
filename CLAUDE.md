@@ -11,15 +11,20 @@ museum visit, or dinner, including when the group splits up. Live at
 
 ## Product invariants — do not violate
 
-- **No backend, ever (for now).** The app is a static site on GitHub Pages. No server storage, no
-  databases, no third-party data services. Robert explicitly does not want responsibility for
-  storing anyone's data.
-- **All state lives client-side**: localStorage for the local copy, and encrypted share-links for
-  sync. The share token travels in the URL *fragment* (`#…`), which browsers never send to servers.
+- **No backend of our own, ever (for now).** The app is a static site on GitHub Pages. No server
+  storage we operate, no databases, no accounts with third-party data services. Robert explicitly
+  does not want responsibility for storing anyone's data.
+- **Nothing readable ever leaves the group's devices.** localStorage holds each device's copy;
+  sync happens via the end-to-end-encrypted trip token — in share-links (URL *fragment* `#…`,
+  never sent to servers) and as ciphertext blobs published to public Nostr relays. Relays are
+  best-effort commodity infrastructure: they may only ever receive ciphertext, and the app must
+  keep working (local copy + manual links) when they're down.
 - **No accounts or login.** Access to a plan is gated only by a pre-shared group passphrase
-  (PBKDF2 → AES-GCM). Only people who know each other in real life share the passphrase.
-- Sync is turn-based by design: edit → share a fresh link in the group chat → friends merge it.
-  Anything fancier (live P2P sync) is a possible future phase, not a reason to add a server.
+  (PBKDF2 → AES-GCM for content; the same passphrase derives the trip's Nostr keypair, so knowing
+  it is also what authorizes publishing updates). Only people who know each other in real life
+  share the passphrase.
+- The share-link flow is the invite mechanism and the fallback — never remove it in favor of
+  relay-only sync.
 
 ## Stack & architecture
 
@@ -31,6 +36,13 @@ No state-management or UI libraries — keep the dependency count low.
 - `src/lib/crypto.ts` — JSON → deflate → AES-GCM (key from passphrase via PBKDF2, fresh salt/iv
   per token) → base64url. Requires a secure context (localhost or HTTPS; `file://` won't work).
 - `src/lib/share.ts` — `FP1_`-prefixed token pack/unpack, token extraction from pasted text.
+- `src/lib/nostr.ts` — minimal NIP-01/NIP-78 implementation: deterministic trip keypair
+  (PBKDF2 from tripId+passphrase → secp256k1 Schnorr via `@noble/curves`; every member derives
+  the *same* keypair, making relay events replaceable per trip), event build/sign/verify,
+  relay list. Kind 30078, d-tag `friendplanner`.
+- `src/lib/sync.ts` — `TripSync`: websocket client for the relays (subscribe → verify → decrypt →
+  `onRemote`; debounced publish to all connected relays; reconnect with backoff).
+- `src/lib/useTripSync.ts` — React hook wrapping `TripSync`; no-op without a stored passphrase.
 - `src/lib/merge.ts` — merges two copies of a trip: newer activity edit wins, votes merge
   per-person by timestamp, deletions survive via tombstones (`deleted: true`, never hard-remove).
 - `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).

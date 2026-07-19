@@ -13,6 +13,13 @@ function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<st
  * Combines two copies of the same trip: activities are matched by id and the
  * newer edit wins, votes are merged per person, deletions survive via tombstones.
  */
+/** Content equality regardless of activity ordering — used to stop publish/merge echo loops. */
+export function sameTrip(a: Trip, b: Trip): boolean {
+  const canonical = (t: Trip) =>
+    JSON.stringify({ ...t, activities: [...t.activities].sort((x, y) => x.id.localeCompare(y.id)) });
+  return canonical(a) === canonical(b);
+}
+
 export function mergeTrips(local: Trip, incoming: Trip): Trip {
   const meta = incoming.updatedAt > local.updatedAt ? incoming : local;
   const byId = new Map<string, Activity>();

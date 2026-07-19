@@ -264,6 +264,15 @@ footer {
 
 /* ---- trip view ---- */
 
+.sync-status {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.sync-status.ok {
+  color: var(--success);
+}
+
 .trip-header {
   display: flex;
   align-items: center;

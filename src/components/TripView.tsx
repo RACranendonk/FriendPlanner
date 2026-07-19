@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { Activity, Trip } from '../types';
 import { formatDay, tripDays } from '../types';
-import { getName, loadTrip, saveTrip, setName } from '../lib/storage';
+import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
+import { mergeTrips, sameTrip } from '../lib/merge';
+import { useTripSync } from '../lib/useTripSync';
 import { ActivityCard } from './ActivityCard';
 import { ActivityForm } from './ActivityForm';
 import { ShareDialog } from './ShareDialog';
@@ -11,6 +13,22 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   const [me, setMe] = useState(getName());
   const [editing, setEditing] = useState<Activity | 'new' | null>(null);
   const [sharing, setSharing] = useState(false);
+
+  const passphrase = useMemo(() => getPassphrase(tripId), [tripId]);
+  const tripRef = useRef(trip);
+  tripRef.current = trip;
+
+  const sync = useTripSync(tripId, passphrase, (incoming) => {
+    const current = tripRef.current;
+    const merged = current ? mergeTrips(current, incoming) : incoming;
+    if (!current || !sameTrip(merged, current)) {
+      saveTrip(merged);
+      setTrip(merged);
+    }
+    // We hold changes the relays haven't seen (or they only had an older
+    // version) — publish the merged state so everyone converges.
+    if (!sameTrip(merged, incoming)) sync.publish(merged);
+  });
 
   const groups = useMemo(() => {
     if (!trip) return [];
@@ -41,6 +59,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     const stamped = { ...next, updatedAt: Date.now() };
     saveTrip(stamped);
     setTrip(stamped);
+    sync.publish(stamped);
   };
 
   const upsertActivity = (act: Activity) => {
@@ -77,6 +96,16 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           <p className="muted">
             {trip.destination && `${trip.destination} · `}
             {formatDay(trip.start)} – {formatDay(trip.end)}
+            {' · '}
+            {sync.connected > 0 ? (
+              <span className="sync-status ok" title={`Connected to ${sync.connected} of ${sync.total} relays`}>
+                ● synced
+              </span>
+            ) : passphrase ? (
+              <span className="sync-status" title="No relay connection — your local copy still works; share a link as fallback">
+                ○ offline
+              </span>
+            ) : null}
           </p>
         </div>
         <button className="primary" onClick={() => setSharing(true)}>

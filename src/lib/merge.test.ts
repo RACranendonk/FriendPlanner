@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeTrips } from './merge';
+import { mergeTrips, sameTrip } from './merge';
 import type { Activity, Trip } from '../types';
 
 function makeActivity(overrides: Partial<Activity> = {}): Activity {
@@ -67,6 +67,13 @@ describe('mergeTrips', () => {
     const incoming = makeTrip({ activities: [makeActivity({ title: 'Edited before the delete', updatedAt: 2 })] });
     const merged = mergeTrips(local, incoming);
     expect(merged.activities[0].deleted).toBe(true);
+  });
+
+  it('reports trips as same regardless of activity order, different on content change', () => {
+    const a1 = makeActivity({ id: 'a1' });
+    const a2 = makeActivity({ id: 'a2' });
+    expect(sameTrip(makeTrip({ activities: [a1, a2] }), makeTrip({ activities: [a2, a1] }))).toBe(true);
+    expect(sameTrip(makeTrip({ activities: [a1] }), makeTrip({ activities: [a1, a2] }))).toBe(false);
   });
 
   it('takes trip metadata from the newer side', () => {

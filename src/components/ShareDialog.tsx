@@ -58,10 +58,11 @@ export function ShareDialog({
   return (
     <div className="overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
-        <h2>Share this plan</h2>
+        <h2>Invite friends</h2>
         <p className="muted small">
-          The link below contains the whole plan, encrypted with your group passphrase. Paste it in your group
-          chat — friends open it and unlock it with the passphrase. No server ever sees your plan.
+          Friends only need this link <strong>once</strong>: it contains the plan, encrypted with your group
+          passphrase. After they unlock it, changes sync automatically between everyone (still encrypted —
+          the relay servers only ever see unreadable ciphertext).
         </p>
         <div className="share-box">
           <input readOnly value={url || 'Encrypting…'} onFocus={(e) => e.target.select()} />
@@ -70,8 +71,11 @@ export function ShareDialog({
           </button>
         </div>
 
-        <h3>Got an update from a friend?</h3>
-        <p className="muted small">Paste their newer link here to merge their changes into your copy.</p>
+        <h3>Got an update link from a friend?</h3>
+        <p className="muted small">
+          Normally unnecessary — changes sync on their own. If the relays are ever unreachable, paste a
+          friend's link here to merge their changes manually.
+        </p>
         <textarea
           rows={2}
           value={pasteText}
