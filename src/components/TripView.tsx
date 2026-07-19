@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import type { Activity, Trip } from '../types';
-import { formatDay, tripDays } from '../types';
+import { formatDay } from '../types';
+import { groupActivities } from '../lib/grouping';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { mergeTrips, sameTrip } from '../lib/merge';
 import { listParticipants, withdrawParticipation } from '../lib/participation';
@@ -31,21 +32,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     if (!sameTrip(merged, incoming)) sync.publish(merged);
   });
 
-  const groups = useMemo(() => {
-    if (!trip) return [];
-    const active = trip.activities.filter((a) => !a.deleted);
-    const days = tripDays(trip);
-    const extraDays = [...new Set(active.map((a) => a.day).filter((d): d is string => !!d && !days.includes(d)))].sort();
-    const slotOrder: Record<string, number> = { allday: 0, morning: 1, afternoon: 2, evening: 3 };
-    const byDay = (day: string | null) =>
-      active
-        .filter((a) => a.day === day)
-        .sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot] || a.title.localeCompare(b.title));
-    return [
-      ...[...days, ...extraDays].map((day) => ({ day, label: formatDay(day), items: byDay(day) })),
-      { day: null, label: 'Sometime during the trip', items: byDay(null) },
-    ];
-  }, [trip]);
+  const groups = useMemo(() => (trip ? groupActivities(trip) : []), [trip]);
 
   if (!trip) {
     return (
