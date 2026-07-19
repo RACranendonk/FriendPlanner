@@ -618,6 +618,56 @@ footer {
   white-space: nowrap;
 }
 
+/* The amount as a real, aligned column — scannable while pushing a cart. */
+.grocery-amount {
+  min-width: 5.5rem;
+  max-width: 8rem;
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grocery-amount.none {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.grocery-list li.done .grocery-amount {
+  color: var(--muted);
+}
+
+.bring-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.grocery-list li:last-child .bring-row {
+  border-bottom: none;
+}
+
+.bring-row .grocery-text .chip {
+  margin-left: 0.5rem;
+}
+
+.bring-claim {
+  cursor: pointer;
+}
+
+/* Deliberately at the bottom of the list, clearly a button — clearing is destructive-ish. */
+.clear-bought {
+  margin-top: 1rem;
+  width: 100%;
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border));
+}
+
 /* ---- llama easter egg ---- */
 
 .compass-egg {

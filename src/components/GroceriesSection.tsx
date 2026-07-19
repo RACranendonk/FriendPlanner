@@ -57,14 +57,7 @@ export function GroceriesSection({
 
   return (
     <section className="card">
-      <div className="section-head">
-        <h2>Groceries</h2>
-        {doneCount > 0 && (
-          <button className="ghost" onClick={clearDone}>
-            Clear {doneCount} bought
-          </button>
-        )}
-      </div>
+      <h2>Groceries</h2>
       <div className="grocery-add">
         <input
           value={text}
@@ -76,7 +69,7 @@ export function GroceriesSection({
         <input
           className="grocery-qty"
           value={quantity}
-          placeholder="How much? (recommended)"
+          placeholder="How much?"
           disabled={!me}
           onChange={(e) => setQuantity(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && add()}
@@ -94,12 +87,17 @@ export function GroceriesSection({
               <label>
                 <input type="checkbox" checked={item.done} onChange={() => toggle(item)} />
                 <span className="grocery-text">{item.text}</span>
-                {item.quantity && <span className="chip">{item.quantity}</span>}
+                <span className={`grocery-amount${item.quantity ? '' : ' none'}`}>{item.quantity || '—'}</span>
                 <span className="muted small grocery-by">{item.addedBy}</span>
               </label>
             </li>
           ))}
         </ul>
+      )}
+      {doneCount > 0 && (
+        <button className="clear-bought" onClick={clearDone}>
+          🧹 Clear {doneCount} bought {doneCount === 1 ? 'item' : 'items'}
+        </button>
       )}
     </section>
   );
