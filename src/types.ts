@@ -55,6 +55,21 @@ export interface Stay {
   deleted?: boolean;
 }
 
+/** One wish on the shared shopping list. */
+export interface GroceryItem {
+  id: string;
+  text: string;
+  /** Free text ("2 packs") — optional but recommended. */
+  quantity: string;
+  addedBy: string;
+  /** Crossed off = bought. LWW via updatedAt, so an uncross beats an older cross. */
+  done: boolean;
+  /** Stable list position — updatedAt changes on every toggle. */
+  createdAt: number;
+  updatedAt: number;
+  deleted?: boolean;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -66,6 +81,8 @@ export interface Trip {
   activities: Activity[];
   /** Accommodation candidates — absent on trips from before this feature. */
   stays?: Stay[];
+  /** Shared shopping list — absent on trips from before this feature. */
+  groceries?: GroceryItem[];
 }
 
 export const CATEGORIES: Record<Category, { label: string; emoji: string }> = {

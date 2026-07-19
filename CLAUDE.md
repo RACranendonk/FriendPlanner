@@ -63,6 +63,9 @@ the relays).
   optional tap-to-pick). Used by the trip map, the card mini-map, and the form's pin picker.
 - `src/components/Llama.tsx` — easter egg: tap the title compass 5× quickly and a llama backflips
   across the page (pure CSS, reduced-motion-aware). Deliberately not in the README — no spoilers.
+- `src/components/GroceriesSection.tsx` — shared shopping list (Groceries tab): add with
+  quantity, cross off (LWW via item updatedAt), clear-bought via tombstones; merge in merge.ts
+  follows the stays pattern (explicit both-sides merge, pre-feature-copy safe).
 - `src/lib/participation.ts` — who's-in listing and merge-safe withdrawal (in:false tombstone
   votes, never entry deletion — see the merge-safety comment there before changing it).
 - `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).

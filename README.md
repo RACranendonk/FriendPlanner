@@ -28,6 +28,9 @@ like, and the group can see at a glance who's going where — including when you
   candidates (Airbnb, Booking, anything with a link), vote "I'd stay here", discuss each option
   in comments, and crown the winner with a 🏆 when it's settled. Lives in its own tab so the
   activity schedule stays front and center.
+- **Groceries tab** — a shared shopping list: add what the house needs (with a quantity), see who
+  asked for it, cross things off as they're bought (or uncross them), and clear the bought ones
+  after a run.
 - **Trip map** — pin activities to a map (paste a Google Maps link, use "Find on map", or tap to
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
 - **Who's in** — the list of everyone participating. If someone drops out, remove them: their

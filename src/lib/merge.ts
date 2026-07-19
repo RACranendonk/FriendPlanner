@@ -1,4 +1,4 @@
-import type { Activity, Comment, Stay, Trip, Vote } from '../types';
+import type { Activity, Comment, GroceryItem, Stay, Trip, Vote } from '../types';
 
 function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<string, Vote> {
   const out: Record<string, Vote> = { ...a };
@@ -40,6 +40,17 @@ function mergeStays(a: Stay[] | undefined, b: Stay[] | undefined): Stay[] {
   return [...byId.values()];
 }
 
+/** Union by id, newer edit wins whole-item — a grocery item is basically one field plus its done flag. */
+function mergeGroceries(a: GroceryItem[] | undefined, b: GroceryItem[] | undefined): GroceryItem[] {
+  const byId = new Map<string, GroceryItem>();
+  for (const item of a ?? []) byId.set(item.id, item);
+  for (const item of b ?? []) {
+    const existing = byId.get(item.id);
+    if (!existing || item.updatedAt >= existing.updatedAt) byId.set(item.id, item);
+  }
+  return [...byId.values()];
+}
+
 /** Content equality regardless of activity/stay ordering — used to stop publish/merge echo loops. */
 export function sameTrip(a: Trip, b: Trip): boolean {
   const byId = (x: { id: string }, y: { id: string }) => x.id.localeCompare(y.id);
@@ -48,6 +59,7 @@ export function sameTrip(a: Trip, b: Trip): boolean {
       ...t,
       activities: [...t.activities].sort(byId),
       stays: [...(t.stays ?? [])].sort(byId),
+      groceries: [...(t.groceries ?? [])].sort(byId),
     });
   return canonical(a) === canonical(b);
 }
@@ -76,6 +88,7 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
     // Explicitly merged from both sides — never inherited from `meta`, so a
     // copy that predates the stays feature can't wipe the other side's stays.
     stays: mergeStays(local.stays, incoming.stays),
+    groceries: mergeGroceries(local.groceries, incoming.groceries),
     updatedAt: Math.max(local.updatedAt, incoming.updatedAt),
   };
 }

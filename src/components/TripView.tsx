@@ -5,6 +5,7 @@ import { goingNames, groupActivities } from '../lib/grouping';
 import { MapView, type MapPin } from './MapView';
 import { googleCalendarUrl } from '../lib/calendar';
 import { StaysSection } from './StaysSection';
+import { GroceriesSection } from './GroceriesSection';
 import { ThemeToggle } from './ThemeToggle';
 import { emptyDayMessage } from '../lib/copy';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
@@ -20,7 +21,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   const [me, setMe] = useState(getName());
   const [editing, setEditing] = useState<Activity | 'new' | null>(null);
   const [sharing, setSharing] = useState(false);
-  const [tab, setTab] = useState<'activities' | 'planning'>('activities');
+  const [tab, setTab] = useState<'activities' | 'planning' | 'groceries'>('activities');
 
   const passphrase = useMemo(() => getPassphrase(tripId), [tripId]);
   const tripRef = useRef(trip);
@@ -162,9 +163,15 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           {(trip.stays ?? []).filter((s) => !s.deleted).length > 0 &&
             ` (${(trip.stays ?? []).filter((s) => !s.deleted).length})`}
         </button>
+        <button className={tab === 'groceries' ? 'active' : ''} onClick={() => setTab('groceries')}>
+          Groceries
+          {(trip.groceries ?? []).filter((g) => !g.deleted && !g.done).length > 0 &&
+            ` (${(trip.groceries ?? []).filter((g) => !g.deleted && !g.done).length})`}
+        </button>
       </nav>
 
       {tab === 'planning' && <StaysSection trip={trip} me={me.trim()} onUpdate={update} />}
+      {tab === 'groceries' && <GroceriesSection trip={trip} me={me.trim()} onUpdate={update} />}
 
       {tab === 'activities' && (
         <>

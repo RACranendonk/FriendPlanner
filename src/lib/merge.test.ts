@@ -99,6 +99,46 @@ describe('mergeTrips', () => {
   });
 });
 
+describe('mergeTrips: groceries', () => {
+  const makeItem = (overrides: Partial<import('../types').GroceryItem> = {}): import('../types').GroceryItem => ({
+    id: 'g1',
+    text: 'Pasta',
+    quantity: '2 packs',
+    addedBy: 'Alex',
+    done: false,
+    createdAt: 1,
+    updatedAt: 1,
+    ...overrides,
+  });
+
+  it('unions items added on both sides and survives pre-feature copies', () => {
+    const local = makeTrip({ groceries: [makeItem({ id: 'g1' })] });
+    const incoming = makeTrip({ groceries: [makeItem({ id: 'g2', text: 'Wine' })] });
+    expect(
+      mergeTrips(local, incoming)
+        .groceries!.map((g) => g.id)
+        .sort(),
+    ).toEqual(['g1', 'g2']);
+
+    const preFeature = makeTrip({ updatedAt: 9 });
+    delete (preFeature as Partial<Trip>).groceries;
+    expect(mergeTrips(preFeature, local).groceries!.length).toBe(1);
+  });
+
+  it('resolves cross-off races to the later action', () => {
+    const crossed = makeTrip({ groceries: [makeItem({ done: true, updatedAt: 5 })] });
+    const uncrossed = makeTrip({ groceries: [makeItem({ done: false, updatedAt: 9 })] });
+    expect(mergeTrips(crossed, uncrossed).groceries![0].done).toBe(false);
+    expect(mergeTrips(uncrossed, crossed).groceries![0].done).toBe(false);
+  });
+
+  it('keeps cleared items gone via tombstones', () => {
+    const cleared = makeTrip({ groceries: [makeItem({ deleted: true, done: true, updatedAt: 9 })] });
+    const stale = makeTrip({ groceries: [makeItem({ done: true, updatedAt: 5 })] });
+    expect(mergeTrips(stale, cleared).groceries![0].deleted).toBe(true);
+  });
+});
+
 describe('mergeTrips: stays', () => {
   const makeStay = (overrides: Partial<import('../types').Stay> = {}): import('../types').Stay => ({
     id: 's1',
