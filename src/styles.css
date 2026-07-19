@@ -315,6 +315,12 @@ footer {
   padding-top: 1rem;
 }
 
+.credits {
+  margin-top: 0.75rem;
+  text-align: center;
+  order: 100;
+}
+
 /* ---- trip view ---- */
 
 .sync-status {

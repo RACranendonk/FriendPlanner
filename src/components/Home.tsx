@@ -6,6 +6,7 @@ import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassp
 import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
 import { CompassEgg } from './Llama';
 import { ThemeToggle } from './ThemeToggle';
+import { Credits } from './Credits';
 
 export function Home({
   onOpenTrip,
@@ -146,6 +147,7 @@ export function Home({
       <footer className="muted small">
         Your plans live only in this browser and in the encrypted links you share. Clearing browser data removes
         them — the latest shared link in your group chat is your backup.
+        <Credits />
       </footer>
     </div>
   );
