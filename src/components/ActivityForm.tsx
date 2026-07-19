@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Activity, Category, Slot, Trip } from '../types';
-import { CATEGORIES, SLOTS, formatDay, tripDays } from '../types';
+import { CATEGORIES, SLOTS, formatDay, slotForTime, tripDays } from '../types';
 import { geocode, isValidCoords, parseCoordsFromUrl, type LatLng } from '../lib/geo';
 import { MapView } from './MapView';
 
@@ -21,6 +21,7 @@ export function ActivityForm({
   const [category, setCategory] = useState<Category>(initial?.category ?? 'other');
   const [day, setDay] = useState(initial?.day ?? '');
   const [slot, setSlot] = useState<Slot>(initial?.slot ?? 'allday');
+  const [time, setTime] = useState(initial?.time ?? '');
   const [locationName, setLocationName] = useState(initial?.locationName ?? '');
   const [locationUrl, setLocationUrl] = useState(initial?.locationUrl ?? '');
   const [notes, setNotes] = useState(initial?.notes ?? '');
@@ -75,6 +76,7 @@ export function ActivityForm({
       category,
       day: day || null,
       slot,
+      time: time || undefined,
       locationName: locationName.trim(),
       locationUrl: locationUrl.trim(),
       lat: pin?.lat,
@@ -125,6 +127,17 @@ export function ActivityForm({
                 </option>
               ))}
             </select>
+          </label>
+          <label className="field">
+            <span>Departure (optional)</span>
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => {
+                setTime(e.target.value);
+                if (e.target.value) setSlot(slotForTime(e.target.value));
+              }}
+            />
           </label>
         </div>
         <label className="field">

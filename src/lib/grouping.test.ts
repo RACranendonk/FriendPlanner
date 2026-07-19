@@ -71,6 +71,16 @@ describe('groupActivities', () => {
     expect(groupActivities(nobody).find((g) => g.day === '2026-08-01')!.topId).toBeNull();
   });
 
+  it('within a slot, timed activities come first in time order, untimed after', () => {
+    const trip = makeTrip([
+      makeActivity({ day: '2026-08-01', slot: 'morning', title: 'Vague stroll' }),
+      makeActivity({ day: '2026-08-01', slot: 'morning', time: '10:30', title: 'Boat' }),
+      makeActivity({ day: '2026-08-01', slot: 'morning', time: '08:15', title: 'Hike' }),
+    ]);
+    const [, first] = groupActivities(trip);
+    expect(first.items.map((a) => a.title)).toEqual(['Hike', 'Boat', 'Vague stroll']);
+  });
+
   it('keeps days outside the trip range visible after their day group', () => {
     const trip = makeTrip([makeActivity({ day: '2026-08-09', title: 'Stray' })]);
     const groups = groupActivities(trip);

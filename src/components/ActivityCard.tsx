@@ -49,7 +49,10 @@ export function ActivityCard({
         <div className="activity-body">
           <div className="activity-title-row">
             <strong>{activity.title}</strong>
-            <span className="chip">{SLOTS[activity.slot]}</span>
+            <span className="chip">
+              {SLOTS[activity.slot]}
+              {activity.time ? ` · ${activity.time}` : ''}
+            </span>
             {going.length > 0 && (
               <span className="chip count" title={`${going.length} joining`}>
                 👥 {going.length}

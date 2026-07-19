@@ -14,8 +14,9 @@ like, and the group can see at a glance who's going where — including when you
 
 - **Trips** — a name, a destination, a date range, and one shared passphrase for the group.
 - **Activities** — title, category (🥾 hike, 🏛️ culture, 🍽️ food, 🏖️ beach, 🚵 sport,
-  🌙 nightlife), day and time of day, notes, a place, and a link (Komoot, tickets, a website —
-  shown labeled by where it leads, so a tap never surprises).
+  🌙 nightlife), day and time of day — plus an exact departure time once one is agreed
+  ("Morning · 08:30") — notes, a place, and a link (Komoot, tickets, a website — shown labeled by
+  where it leads, so a tap never surprises).
 - **Voting** — tap "I'm in" to join an activity. Every card shows who's going and a count; the
   most popular activity floats to the top of each day and a clear winner gets a highlighted card.
 - **Ideas pile** — activities without a day yet sit at the top of the plan: they're the ones that

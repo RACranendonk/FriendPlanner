@@ -43,6 +43,9 @@ export function groupActivities(trip: Trip): DayGroup[] {
         (a, b) =>
           goingCount(b) - goingCount(a) ||
           SLOT_ORDER[a.slot] - SLOT_ORDER[b.slot] ||
+          // Within a slot, concrete departure times come first, in time order
+          // (the form keeps slot and time consistent, so this reads as one axis).
+          (a.time ?? '99:99').localeCompare(b.time ?? '99:99') ||
           a.title.localeCompare(b.title),
       );
     const top = items[0];

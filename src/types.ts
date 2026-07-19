@@ -14,6 +14,8 @@ export interface Activity {
   /** ISO date (yyyy-mm-dd) or null when not scheduled yet. */
   day: string | null;
   slot: Slot;
+  /** Optional start/departure time (HH:MM). Precision on top of the slot, never instead of it. */
+  time?: string;
   locationName: string;
   locationUrl: string;
   /** Optional map pin. Absent on activities nobody has located yet (and on pre-map trips). */
@@ -47,6 +49,15 @@ export const CATEGORIES: Record<Category, { label: string; emoji: string }> = {
   nightlife: { label: 'Nightlife', emoji: '🌙' },
   other: { label: 'Other', emoji: '📌' },
 };
+
+/** The slot a given HH:MM time falls in, so a picked time and the slot never contradict. */
+export function slotForTime(time: string): Slot {
+  const hour = parseInt(time.slice(0, 2), 10);
+  if (Number.isNaN(hour)) return 'allday';
+  if (hour < 12) return 'morning';
+  if (hour < 17) return 'afternoon';
+  return 'evening';
+}
 
 export const SLOTS: Record<Slot, string> = {
   allday: 'All day',
