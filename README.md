@@ -27,7 +27,9 @@ like, and the group can see at a glance who's going where — including when you
 - **Planning tab** — before the activities, decide the trip itself: collect accommodation
   candidates (Airbnb, Booking, anything with a link), vote "I'd stay here", discuss each option
   in comments, and crown the winner with a 🏆 when it's settled. Lives in its own tab so the
-  activity schedule stays front and center.
+  activity schedule stays front and center. The same tab holds the **bringing-from-home list**:
+  the scale, the salt & pepper, the board games — anyone can add what's needed, and a tap on
+  "I'll bring it" claims it (🎒) so nothing arrives in fivefold or not at all.
 - **Groceries tab** — a shared shopping list: add what the house needs (with a quantity), see who
   asked for it, cross things off as they're bought (or uncross them), and clear the bought ones
   after a run.

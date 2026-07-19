@@ -1,4 +1,4 @@
-import type { Activity, Comment, GroceryItem, Stay, Trip, Vote } from '../types';
+import type { Activity, BringItem, Comment, GroceryItem, Stay, Trip, Vote } from '../types';
 
 // The sample friends (Alex, Billie, Charlie, Dana) are deliberately fictional —
 // never real names from anyone's group.
@@ -154,7 +154,31 @@ export function createDemoTrip(): Trip {
     ],
     stays: demoStays(now),
     groceries: demoGroceries(now),
+    bring: demoBring(now),
   };
+}
+
+function demoBring(now: number): BringItem[] {
+  let order = 0;
+  const item = (text: string, quantity: string, addedBy: string, broughtBy = ''): BringItem => {
+    const createdAt = now - 9_000_000 + order++ * 300_000;
+    return {
+      id: crypto.randomUUID(),
+      text,
+      quantity,
+      addedBy,
+      broughtBy,
+      createdAt,
+      updatedAt: broughtBy ? createdAt + 1_800_000 : createdAt,
+    };
+  };
+  return [
+    item('Kitchen scale', 'the small one', 'Dana', 'Dana'),
+    item('Salt, pepper & olive oil', 'starter kit', 'Alex', 'Alex'),
+    item('Board games', 'Wingspan + cards', 'Billie', 'Billie'),
+    item('Bluetooth speaker', '', 'Charlie'),
+    item('First-aid kit', '', 'Alex'),
+  ];
 }
 
 function demoGroceries(now: number): GroceryItem[] {

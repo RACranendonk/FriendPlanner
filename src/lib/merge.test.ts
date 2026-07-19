@@ -139,6 +139,46 @@ describe('mergeTrips: groceries', () => {
   });
 });
 
+describe('mergeTrips: bring-from-home', () => {
+  const makeBring = (overrides: Partial<import('../types').BringItem> = {}): import('../types').BringItem => ({
+    id: 'b1',
+    text: 'Kitchen scale',
+    quantity: '',
+    addedBy: 'Alex',
+    broughtBy: '',
+    createdAt: 1,
+    updatedAt: 1,
+    ...overrides,
+  });
+
+  it('unions items and survives pre-feature copies', () => {
+    const local = makeTrip({ bring: [makeBring({ id: 'b1' })] });
+    const incoming = makeTrip({ bring: [makeBring({ id: 'b2', text: 'Board games' })] });
+    expect(
+      mergeTrips(local, incoming)
+        .bring!.map((b) => b.id)
+        .sort(),
+    ).toEqual(['b1', 'b2']);
+
+    const preFeature = makeTrip({ updatedAt: 9 });
+    delete (preFeature as Partial<Trip>).bring;
+    expect(mergeTrips(preFeature, local).bring!.length).toBe(1);
+  });
+
+  it('resolves claim races to the later action', () => {
+    const claimedByDana = makeTrip({ bring: [makeBring({ broughtBy: 'Dana', updatedAt: 5 })] });
+    const unclaimed = makeTrip({ bring: [makeBring({ broughtBy: '', updatedAt: 9 })] });
+    expect(mergeTrips(claimedByDana, unclaimed).bring![0].broughtBy).toBe('');
+    expect(mergeTrips(unclaimed, claimedByDana).bring![0].broughtBy).toBe('');
+  });
+
+  it('keeps removals via tombstones', () => {
+    const removed = makeTrip({ bring: [makeBring({ deleted: true, updatedAt: 9 })] });
+    const stale = makeTrip({ bring: [makeBring({ updatedAt: 5 })] });
+    expect(mergeTrips(stale, removed).bring![0].deleted).toBe(true);
+  });
+});
+
 describe('mergeTrips: stays', () => {
   const makeStay = (overrides: Partial<import('../types').Stay> = {}): import('../types').Stay => ({
     id: 's1',

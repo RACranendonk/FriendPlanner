@@ -6,6 +6,7 @@ import { MapView, type MapPin } from './MapView';
 import { googleCalendarUrl } from '../lib/calendar';
 import { StaysSection } from './StaysSection';
 import { GroceriesSection } from './GroceriesSection';
+import { BringSection } from './BringSection';
 import { ThemeToggle } from './ThemeToggle';
 import { emptyDayMessage } from '../lib/copy';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
@@ -170,7 +171,12 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
         </button>
       </nav>
 
-      {tab === 'planning' && <StaysSection trip={trip} me={me.trim()} onUpdate={update} />}
+      {tab === 'planning' && (
+        <>
+          <StaysSection trip={trip} me={me.trim()} onUpdate={update} />
+          <BringSection trip={trip} me={me.trim()} onUpdate={update} />
+        </>
+      )}
       {tab === 'groceries' && <GroceriesSection trip={trip} me={me.trim()} onUpdate={update} />}
 
       {tab === 'activities' && (

@@ -1,4 +1,4 @@
-import type { Activity, Comment, GroceryItem, Stay, Trip, Vote } from '../types';
+import type { Activity, Comment, Stay, Trip, Vote } from '../types';
 
 function mergeVotes(a: Record<string, Vote>, b: Record<string, Vote>): Record<string, Vote> {
   const out: Record<string, Vote> = { ...a };
@@ -40,9 +40,13 @@ function mergeStays(a: Stay[] | undefined, b: Stay[] | undefined): Stay[] {
   return [...byId.values()];
 }
 
-/** Union by id, newer edit wins whole-item — a grocery item is basically one field plus its done flag. */
-function mergeGroceries(a: GroceryItem[] | undefined, b: GroceryItem[] | undefined): GroceryItem[] {
-  const byId = new Map<string, GroceryItem>();
+/**
+ * Union by id, newer edit wins whole-item. For simple list items (groceries,
+ * bring-from-home) whose state is essentially one flag/field: a toggle race
+ * resolves to the later action, tombstones survive.
+ */
+function mergeLwwList<T extends { id: string; updatedAt: number }>(a: T[] | undefined, b: T[] | undefined): T[] {
+  const byId = new Map<string, T>();
   for (const item of a ?? []) byId.set(item.id, item);
   for (const item of b ?? []) {
     const existing = byId.get(item.id);
@@ -60,6 +64,7 @@ export function sameTrip(a: Trip, b: Trip): boolean {
       activities: [...t.activities].sort(byId),
       stays: [...(t.stays ?? [])].sort(byId),
       groceries: [...(t.groceries ?? [])].sort(byId),
+      bring: [...(t.bring ?? [])].sort(byId),
     });
   return canonical(a) === canonical(b);
 }
@@ -88,7 +93,8 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
     // Explicitly merged from both sides — never inherited from `meta`, so a
     // copy that predates the stays feature can't wipe the other side's stays.
     stays: mergeStays(local.stays, incoming.stays),
-    groceries: mergeGroceries(local.groceries, incoming.groceries),
+    groceries: mergeLwwList(local.groceries, incoming.groceries),
+    bring: mergeLwwList(local.bring, incoming.bring),
     updatedAt: Math.max(local.updatedAt, incoming.updatedAt),
   };
 }

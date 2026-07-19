@@ -22,6 +22,8 @@ describe('createDemoTrip', () => {
     expect(trip.stays!.length).toBeGreaterThanOrEqual(2);
     expect(trip.stays!.every((s) => !s.deleted)).toBe(true);
     expect(trip.stays!.some((s) => s.comments.length > 0)).toBe(true);
+    expect(trip.bring!.some((b) => b.broughtBy !== '')).toBe(true);
+    expect(trip.bring!.some((b) => b.broughtBy === '')).toBe(true);
     expect(trip.groceries!.some((g) => g.done)).toBe(true);
     expect(trip.groceries!.some((g) => !g.done)).toBe(true);
     expect(trip.groceries!.every((g) => !g.deleted && g.addedBy !== '')).toBe(true);

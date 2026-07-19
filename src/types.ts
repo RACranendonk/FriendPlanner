@@ -70,6 +70,20 @@ export interface GroceryItem {
   deleted?: boolean;
 }
 
+/** Something coming from home — a scale, salt & pepper, board games. */
+export interface BringItem {
+  id: string;
+  text: string;
+  /** Optional detail ("the big one", "2 decks"). */
+  quantity: string;
+  addedBy: string;
+  /** Who's bringing it — empty while still unclaimed. */
+  broughtBy: string;
+  createdAt: number;
+  updatedAt: number;
+  deleted?: boolean;
+}
+
 export interface Trip {
   id: string;
   name: string;
@@ -83,6 +97,8 @@ export interface Trip {
   stays?: Stay[];
   /** Shared shopping list — absent on trips from before this feature. */
   groceries?: GroceryItem[];
+  /** Bringing-from-home list — absent on trips from before this feature. */
+  bring?: BringItem[];
 }
 
 export const CATEGORIES: Record<Category, { label: string; emoji: string }> = {
