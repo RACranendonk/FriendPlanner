@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { GroceryItem, Trip } from '../types';
 
 /**
@@ -16,6 +16,7 @@ export function GroceriesSection({
 }) {
   const [text, setText] = useState('');
   const [quantity, setQuantity] = useState('');
+  const itemInputRef = useRef<HTMLInputElement>(null);
 
   const items = (trip.groceries ?? [])
     .filter((g) => !g.deleted)
@@ -41,6 +42,8 @@ export function GroceriesSection({
     ]);
     setText('');
     setQuantity('');
+    // The next entry starts with its name, wherever the add came from.
+    itemInputRef.current?.focus();
   };
 
   const toggle = (item: GroceryItem) => {
@@ -60,6 +63,7 @@ export function GroceriesSection({
       <h2>Groceries</h2>
       <div className="grocery-add">
         <input
+          ref={itemInputRef}
           value={text}
           placeholder={me ? 'e.g. Pasta' : 'Enter your name above to add items'}
           disabled={!me}

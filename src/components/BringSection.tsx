@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { BringItem, Trip } from '../types';
 
 /**
@@ -17,6 +17,7 @@ export function BringSection({
 }) {
   const [text, setText] = useState('');
   const [quantity, setQuantity] = useState('');
+  const itemInputRef = useRef<HTMLInputElement>(null);
 
   const items = (trip.bring ?? [])
     .filter((b) => !b.deleted)
@@ -41,6 +42,7 @@ export function BringSection({
     ]);
     setText('');
     setQuantity('');
+    itemInputRef.current?.focus();
   };
 
   const setBringer = (item: BringItem, person: string) => {
@@ -59,6 +61,7 @@ export function BringSection({
       <h2>Bringing from home</h2>
       <div className="grocery-add">
         <input
+          ref={itemInputRef}
           value={text}
           placeholder={me ? 'e.g. Kitchen scale' : 'Enter your name above to add items'}
           disabled={!me}
