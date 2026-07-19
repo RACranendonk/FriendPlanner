@@ -308,6 +308,17 @@ footer {
   gap: 0.6rem;
 }
 
+/* The group's unique most-joined activity: a subtly brighter card, not a badge. */
+.activity.popular {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--card) 92%, var(--accent));
+}
+
+.chip.count {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
 .activity-main {
   display: flex;
   gap: 0.7rem;

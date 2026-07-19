@@ -160,6 +160,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
                     key={act.id}
                     activity={act}
                     me={me.trim()}
+                    highlight={act.id === group.topId}
                     onToggle={() => toggleVote(act)}
                     onEdit={() => setEditing(act)}
                     onDelete={() => removeActivity(act)}

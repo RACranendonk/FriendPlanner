@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Activity } from '../types';
 import { CATEGORIES, SLOTS } from '../types';
+import { goingNames } from '../lib/grouping';
 
 /** Komoot tours and named places can be shown inline; other links just open in a new tab. */
 function embedUrl(act: Activity): string | null {
@@ -13,27 +14,26 @@ function embedUrl(act: Activity): string | null {
 export function ActivityCard({
   activity,
   me,
+  highlight,
   onToggle,
   onEdit,
   onDelete,
 }: {
   activity: Activity;
   me: string;
+  highlight: boolean;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
   const [showMap, setShowMap] = useState(false);
   const category = CATEGORIES[activity.category];
-  const going = Object.entries(activity.votes)
-    .filter(([, vote]) => vote.in)
-    .map(([person]) => person)
-    .sort((a, b) => a.localeCompare(b));
+  const going = goingNames(activity);
   const imIn = me !== '' && going.includes(me);
   const map = embedUrl(activity);
 
   return (
-    <article className="card activity">
+    <article className={`card activity${highlight ? ' popular' : ''}`}>
       <div className="activity-main">
         <span className="cat-emoji" title={category.label}>
           {category.emoji}
@@ -42,6 +42,11 @@ export function ActivityCard({
           <div className="activity-title-row">
             <strong>{activity.title}</strong>
             <span className="chip">{SLOTS[activity.slot]}</span>
+            {going.length > 0 && (
+              <span className="chip count" title={`${going.length} joining`}>
+                👥 {going.length}
+              </span>
+            )}
           </div>
           {(activity.locationName || activity.locationUrl) && (
             <p className="muted small">
