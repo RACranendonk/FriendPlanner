@@ -96,6 +96,8 @@ export interface BringItem {
 export interface Trip {
   id: string;
   name: string;
+  /** Demo trips are a local-only playground: never synced to relays, never shareable. */
+  demo?: boolean;
   destination: string;
   /** Optional free-text blurb shown under the trip header. Absent on older trips. */
   description?: string;
@@ -117,6 +119,13 @@ export interface Trip {
   groceries?: GroceryItem[];
   /** Bringing-from-home list — absent on trips from before this feature. */
   bring?: BringItem[];
+  /**
+   * Per-person {in, ts} presence, same shape and merge rules as activity
+   * votes: set true the moment someone's name is known while viewing the
+   * trip (not only once they join something), false as a withdrawal
+   * tombstone. Absent on trips from before this feature.
+   */
+  visited?: Record<string, Vote>;
 }
 
 export const CATEGORIES: Record<Category, { label: string; emoji: string }> = {

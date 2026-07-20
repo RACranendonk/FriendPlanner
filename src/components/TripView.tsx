@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Activity, Trip } from '../types';
 import { CATEGORIES, SLOTS, formatDay } from '../types';
 import { goingNames, groupActivities } from '../lib/grouping';
@@ -26,7 +26,9 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   const [sharing, setSharing] = useState(false);
   const [tab, setTab] = useState<'activities' | 'planning' | 'groceries'>('activities');
 
-  const passphrase = useMemo(() => getPassphrase(tripId), [tripId]);
+  // Demo trips are a local-only playground: an empty passphrase keeps
+  // useTripSync a no-op, so nothing ever gets published to the relays.
+  const passphrase = useMemo(() => (trip?.demo ? '' : getPassphrase(tripId)), [tripId, trip?.demo]);
   const tripRef = useRef(trip);
   tripRef.current = trip;
 
@@ -116,10 +118,28 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
     setName(value);
   };
 
+  // Marks someone present in "who's in" the moment their name is known for
+  // this trip — not only once they vote. Guarded so it fires once per
+  // person, never on the demo trip (which never syncs), and reads via
+  // tripRef so a stale closure can't resurrect an already-withdrawn person.
+  const addVisited = (person: string) => {
+    const current = tripRef.current;
+    if (!person || !current || current.demo || current.visited?.[person]?.in) return;
+    update({ ...current, visited: { ...(current.visited ?? {}), [person]: { in: true, ts: Date.now() } } });
+  };
+
+  useEffect(() => {
+    // Only for a name already known when the trip opens (returning
+    // visitors). Someone typing their name for the first time is added on
+    // blur below instead — firing this on every keystroke would record each
+    // partial keystroke as a "participant".
+    addVisited(me.trim());
+  }, [tripId]);
+
   const participants = listParticipants(trip);
 
   const removeParticipation = (person: string) => {
-    const label = person === me.trim() ? 'Leave all activities you joined?' : `Remove ${person} from everything they joined?`;
+    const label = person === me.trim() ? 'Leave the trip and any activities you joined?' : `Remove ${person} from "who's in" and everything they joined?`;
     if (!confirm(`${label} Activities they suggested stay in the plan.`)) return;
     update(withdrawParticipation(trip, person));
   };
@@ -154,16 +174,23 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           {trip.description && <p className="muted small trip-desc">{trip.description}</p>}
         </div>
         <ThemeToggle />
-        <button className="primary" onClick={() => setSharing(true)}>
-          Share
-        </button>
+        {!trip.demo && (
+          <button className="primary" onClick={() => setSharing(true)}>
+            Share
+          </button>
+        )}
       </header>
 
       {!me.trim() && (
         <section className="card highlight">
           <label className="field">
             <span>Enter your name to join activities</span>
-            <input value={me} placeholder="e.g. Robert" onChange={(e) => saveMyName(e.target.value)} />
+            <input
+              value={me}
+              placeholder="e.g. Robert"
+              onChange={(e) => saveMyName(e.target.value)}
+              onBlur={() => addVisited(me.trim())}
+            />
           </label>
         </section>
       )}
@@ -220,7 +247,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
                 {person}
                 <button
                   className="chip-x"
-                  title={`Remove ${person}'s participation (their suggestions stay)`}
+                  title={`Remove ${person} from the list`}
                   onClick={() => removeParticipation(person)}
                 >
                   ✕
@@ -229,7 +256,8 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
             ))}
           </div>
           <p className="muted small">
-            Removing someone clears their "I'm in" everywhere — activities they suggested stay in the plan.
+            Everyone who's opened the trip or joined an activity. Removing someone clears their "I'm in" everywhere —
+            activities they suggested stay in the plan.
           </p>
         </section>
       )}

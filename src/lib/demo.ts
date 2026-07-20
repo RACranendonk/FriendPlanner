@@ -52,6 +52,7 @@ export function createDemoTrip(): Trip {
   return {
     id: crypto.randomUUID(),
     name: 'Demo: Tuscany getaway',
+    demo: true,
     destination: 'Florence, Italy',
     description: 'Four days of hills, art and far too much pasta. Tap the ✏️ up top to change the name, dates or this text.',
     start: day(0),

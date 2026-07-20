@@ -129,6 +129,7 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
     stays: mergeStays(local.stays, incoming.stays),
     groceries: mergeLwwList(local.groceries, incoming.groceries),
     bring: mergeLwwList(local.bring, incoming.bring),
+    visited: mergeVotes(local.visited ?? {}, incoming.visited ?? {}),
     updatedAt: Math.max(local.updatedAt, incoming.updatedAt),
   };
 }

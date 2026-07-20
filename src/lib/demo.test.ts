@@ -36,6 +36,10 @@ describe('createDemoTrip', () => {
     expect(createDemoTrip().id).not.toBe(createDemoTrip().id);
   });
 
+  it('is flagged as a local-only demo trip', () => {
+    expect(createDemoTrip().demo).toBe(true);
+  });
+
   it('shows a same-slot split: two activities on one day and slot with different people going', () => {
     const trip = createDemoTrip();
     const going = (title: string) => {

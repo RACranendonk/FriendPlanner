@@ -4,7 +4,8 @@
 your data.**
 
 Live at **https://racranendonk.github.io/FriendPlanner/** · Curious? Hit **"Try a demo trip"** on
-the home screen for a ready-made sample you can safely poke around in.
+the home screen for a ready-made sample you can safely poke around in — it stays entirely on your
+device and is never shared or synced.
 
 Some of you want to hike, others want museums, and half the group decides at breakfast.
 FriendPlanner keeps the plan in one place: everyone sees the ideas, taps **"I'm in"** on what they
@@ -39,8 +40,11 @@ like, and the group can see at a glance who's going where — including when you
   after a run.
 - **Trip map** — pin activities to a map (paste a Google Maps link, use "Find on map", or tap to
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
-- **Who's in** — the list of everyone participating. If someone drops out, remove them: their
-  "I'm in"s disappear everywhere, but every idea they contributed stays.
+  A pinned activity also gets a 🧭 button that opens your phone's navigation app for turn-by-turn
+  directions there.
+- **Who's in** — everyone who's opened the trip or joined an activity, seen at a glance. If
+  someone drops out, remove them: their "I'm in"s and their spot on this list disappear, but every
+  idea they contributed stays.
 - **Your look** — follows your phone's light/dark setting by default; the 🌗 button switches
   between light, dark, and follow-device whenever you prefer otherwise. Activity cards carry a
   color edge per category, so a hike day and a museum day look different at a glance.

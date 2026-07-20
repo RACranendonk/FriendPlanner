@@ -40,6 +40,19 @@ describe('listParticipants', () => {
     ]);
     expect(listParticipants(trip)).toEqual(['Alex']);
   });
+
+  it('also lists people present via trip.visited, even without any vote', () => {
+    const trip = { ...makeTrip([]), visited: { Charlie: { in: true, ts: 1 }, Dana: { in: false, ts: 2 } } };
+    expect(listParticipants(trip)).toEqual(['Charlie']);
+  });
+
+  it('does not double-count someone who both voted and visited', () => {
+    const trip = {
+      ...makeTrip([makeActivity({ id: 'a1', votes: { Alex: { in: true, ts: 1 } } })]),
+      visited: { Alex: { in: true, ts: 1 } },
+    };
+    expect(listParticipants(trip)).toEqual(['Alex']);
+  });
 });
 
 describe('withdrawParticipation', () => {
@@ -68,5 +81,18 @@ describe('withdrawParticipation', () => {
     expect(listParticipants(merged)).toEqual(['Billie']);
     const mergedOtherWay = mergeTrips(trip, withdrawn);
     expect(listParticipants(mergedOtherWay)).toEqual(['Billie']);
+  });
+
+  it('also withdraws trip.visited presence, and survives merging with an older copy', () => {
+    const visitedTrip = { ...trip, visited: { Alex: { in: true, ts: 20 }, Billie: { in: true, ts: 21 } } };
+    const withdrawn = withdrawParticipation(visitedTrip, 'Alex');
+    expect(listParticipants(withdrawn)).toEqual(['Billie']);
+    expect(listParticipants(mergeTrips(withdrawn, visitedTrip))).toEqual(['Billie']);
+    expect(listParticipants(mergeTrips(visitedTrip, withdrawn))).toEqual(['Billie']);
+  });
+
+  it('leaves trip.visited alone for someone who was never marked present', () => {
+    const after = withdrawParticipation(trip, 'Alex');
+    expect(after.visited).toBeUndefined();
   });
 });

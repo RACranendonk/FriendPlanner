@@ -104,6 +104,24 @@ describe('mergeTrips', () => {
     expect(mergeTrips(a, b).name).toBe(mergeTrips(b, a).name);
   });
 
+  it('merges trip.visited per person like votes, keeping each person\'s latest presence', () => {
+    const local = makeTrip({ visited: { Robert: { in: true, ts: 5 }, Anna: { in: false, ts: 2 } } });
+    const incoming = makeTrip({ visited: { Anna: { in: true, ts: 9 }, Ben: { in: true, ts: 1 } } });
+    const merged = mergeTrips(local, incoming);
+    expect(merged.visited).toEqual({
+      Robert: { in: true, ts: 5 },
+      Anna: { in: true, ts: 9 },
+      Ben: { in: true, ts: 1 },
+    });
+  });
+
+  it('merges trip.visited safely when one side predates the feature', () => {
+    const local = makeTrip({ visited: { Robert: { in: true, ts: 5 } } });
+    const incoming = makeTrip({});
+    expect(mergeTrips(local, incoming).visited).toEqual({ Robert: { in: true, ts: 5 } });
+    expect(mergeTrips(incoming, local).visited).toEqual({ Robert: { in: true, ts: 5 } });
+  });
+
   it('reports trips as same regardless of activity order, different on content change', () => {
     const a1 = makeActivity({ id: 'a1' });
     const a2 = makeActivity({ id: 'a2' });
