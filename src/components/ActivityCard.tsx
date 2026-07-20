@@ -3,7 +3,7 @@ import type { Activity } from '../types';
 import { CATEGORIES, SLOTS } from '../types';
 import { goingNames } from '../lib/grouping';
 import { linkInfo } from '../lib/linkinfo';
-import { navUrl } from '../lib/geo';
+import { isValidCoords, navUrl } from '../lib/geo';
 import { MapView } from './MapView';
 import { CommentThread } from './CommentThread';
 
@@ -42,7 +42,9 @@ export function ActivityCard({
   const category = CATEGORIES[activity.category];
   const going = goingNames(activity);
   const imIn = me !== '' && going.includes(me);
-  const hasPin = activity.lat != null && activity.lng != null;
+  // Guards against a malformed pin (e.g. a hand-edited or corrupted synced
+  // trip) reaching Leaflet or the nav link with garbage coordinates.
+  const hasPin = activity.lat != null && activity.lng != null && isValidCoords(activity.lat, activity.lng);
   const map = hasPin ? 'pin' : embedUrl(activity);
   const link = linkInfo(activity.locationUrl);
 

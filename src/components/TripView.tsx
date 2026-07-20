@@ -10,6 +10,7 @@ import { BringSection } from './BringSection';
 import { ThemeToggle } from './ThemeToggle';
 import { emptyDayMessage } from '../lib/copy';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
+import { isValidCoords } from '../lib/geo';
 import { mergeTrips, sameTrip } from '../lib/merge';
 import { listParticipants, withdrawParticipation } from '../lib/participation';
 import { useTripSync } from '../lib/useTripSync';
@@ -54,7 +55,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   const pins = useMemo<MapPin[]>(
     () =>
       (trip?.activities ?? [])
-        .filter((a) => !a.deleted && a.lat != null && a.lng != null)
+        .filter((a) => !a.deleted && a.lat != null && a.lng != null && isValidCoords(a.lat, a.lng))
         .map((a) => ({
           id: a.id,
           lat: a.lat!,

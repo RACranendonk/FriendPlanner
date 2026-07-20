@@ -40,8 +40,16 @@ export function ShareDialog({
   const inviteUrl = shareUrl(inviteToken(trip.id));
 
   useEffect(() => {
-    // The invite link only works if the relays hold the current plan — make sure they do.
+    // The invite link only works if the relays hold the current plan — make sure
+    // they do. Once per time the dialog opens, not on every trip prop change:
+    // remote edits from friends keep arriving (and reassigning `trip`) while this
+    // dialog stays open, and re-publishing on each one would just resend the same
+    // state back to the relays repeatedly.
     onEnsurePublished();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trip.id]);
+
+  useEffect(() => {
     let alive = true;
     tripToToken(trip, passphrase).then((token) => {
       if (alive) setBackupUrl(shareUrl(token));
@@ -49,7 +57,6 @@ export function ShareDialog({
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trip, passphrase]);
 
   const importUpdate = async () => {

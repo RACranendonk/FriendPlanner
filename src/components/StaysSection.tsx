@@ -236,7 +236,9 @@ function StayForm({
       title: title.trim(),
       url: url.trim(),
       details: details.trim(),
-      votes: initial?.votes ?? (me ? { [me]: { in: true, ts: Date.now() } } : {}),
+      // votes is a read-only legacy field now (see rating.ts): ratings superseded it,
+      // so new stays never write to it — only old data still carries entries.
+      votes: initial?.votes ?? {},
       comments: initial?.comments ?? [],
       decided: initial?.decided,
       createdBy: initial?.createdBy ?? me,
