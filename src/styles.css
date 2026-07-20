@@ -834,4 +834,16 @@ footer {
     flex-direction: column;
     align-items: stretch;
   }
+
+  /* The stay card's rating row (5 emoji buttons) is too wide next to Decide/Edit/Delete
+     on narrow phones; wrap those buttons onto their own line below it instead of
+     letting them get pushed off-screen. */
+  .activity-actions {
+    flex-wrap: wrap;
+  }
+
+  .activity-actions .spacer {
+    flex-basis: 100%;
+    height: 0;
+  }
 }

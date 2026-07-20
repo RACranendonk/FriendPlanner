@@ -1,7 +1,7 @@
 import type { Stay } from '../types';
 
 export const RATING_LEVELS = [
-  { score: 1, emoji: '😖', label: 'Hate it' },
+  { score: 1, emoji: '🤮', label: 'Hate it' },
   { score: 2, emoji: '😕', label: 'Meh' },
   { score: 3, emoji: '😐', label: 'Neutral' },
   { score: 4, emoji: '🙂', label: 'Like it' },
