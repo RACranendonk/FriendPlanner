@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isValidCoords, parseCoordsFromUrl } from './geo';
+import { isValidCoords, navUrl, parseCoordsFromUrl } from './geo';
+
+describe('navUrl', () => {
+  it('builds a geo: URI carrying the coordinates', () => {
+    expect(navUrl(43.7677, 11.2553)).toBe('geo:43.7677,11.2553?q=43.7677,11.2553');
+  });
+});
 
 describe('parseCoordsFromUrl', () => {
   it('parses the @lat,lng viewport form', () => {

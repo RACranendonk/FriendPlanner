@@ -21,6 +21,16 @@ export function parseCoordsFromUrl(url: string): LatLng | null {
 }
 
 /**
+ * A `geo:` URI (RFC 5870) for a pinned location — tapping it on a phone lets
+ * the OS offer whichever navigation app is installed (Google Maps, Waze,
+ * Apple Maps, …) instead of hard-coding one. Desktop browsers with no
+ * handler registered simply do nothing, which is an acceptable no-op there.
+ */
+export function navUrl(lat: number, lng: number): string {
+  return `geo:${lat},${lng}?q=${lat},${lng}`;
+}
+
+/**
  * Best-effort geocoding via Nominatim, OpenStreetMap's free public geocoder
  * (no key; polite-use limits that a friend group never approaches — revisit
  * if the app grows a large public user base). The query goes to OSM's

@@ -3,6 +3,7 @@ import type { Activity } from '../types';
 import { CATEGORIES, SLOTS } from '../types';
 import { goingNames } from '../lib/grouping';
 import { linkInfo } from '../lib/linkinfo';
+import { navUrl } from '../lib/geo';
 import { MapView } from './MapView';
 import { CommentThread } from './CommentThread';
 
@@ -119,6 +120,11 @@ export function ActivityCard({
           {imIn ? "✓ I'm in — tap to leave" : "I'm in"}
         </button>
         <span className="spacer" />
+        {hasPin && (
+          <a className="linkbtn" href={navUrl(activity.lat!, activity.lng!)} title="Navigate there">
+            🧭
+          </a>
+        )}
         {calendarUrl && (
           <a
             className="linkbtn"
