@@ -78,8 +78,25 @@ export function sameTrip(a: Trip, b: Trip): boolean {
   return canonical(a) === canonical(b);
 }
 
+/**
+ * Trip-level fields (name, destination, dates, description) win by their own
+ * metaUpdatedAt, not trip.updatedAt — the latter bumps on every change, so a
+ * rename would otherwise lose to an unrelated concurrent vote. Pre-feature
+ * copies (no metaUpdatedAt) count as 0, so any real edit beats them. Equal
+ * timestamps break by content, so both devices resolve a tie the same way
+ * instead of each keeping its own side and ping-ponging publishes.
+ */
+function pickMeta(local: Trip, incoming: Trip): Trip {
+  const localTs = local.metaUpdatedAt ?? 0;
+  const incomingTs = incoming.metaUpdatedAt ?? 0;
+  if (incomingTs !== localTs) return incomingTs > localTs ? incoming : local;
+  const key = (t: Trip) => JSON.stringify([t.name, t.destination, t.start, t.end, t.description ?? '']);
+  return key(incoming) > key(local) ? incoming : local;
+}
+
 export function mergeTrips(local: Trip, incoming: Trip): Trip {
   const meta = incoming.updatedAt > local.updatedAt ? incoming : local;
+  const tripMeta = pickMeta(local, incoming);
   const byId = new Map<string, Activity>();
   for (const act of local.activities) byId.set(act.id, act);
   for (const act of incoming.activities) {
@@ -98,6 +115,14 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
   }
   return {
     ...meta,
+    // All five set explicitly (even when undefined) so the meta winner fully
+    // controls them — e.g. a cleared description stays cleared.
+    name: tripMeta.name,
+    destination: tripMeta.destination,
+    description: tripMeta.description,
+    start: tripMeta.start,
+    end: tripMeta.end,
+    metaUpdatedAt: tripMeta.metaUpdatedAt,
     activities: [...byId.values()],
     // Explicitly merged from both sides — never inherited from `meta`, so a
     // copy that predates the stays feature can't wipe the other side's stays.

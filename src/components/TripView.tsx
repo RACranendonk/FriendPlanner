@@ -16,11 +16,13 @@ import { useTripSync } from '../lib/useTripSync';
 import { ActivityCard } from './ActivityCard';
 import { ActivityForm } from './ActivityForm';
 import { ShareDialog } from './ShareDialog';
+import { TripDetailsForm } from './TripDetailsForm';
 
 export function TripView({ tripId, onBack }: { tripId: string; onBack: () => void }) {
   const [trip, setTrip] = useState<Trip | null>(() => loadTrip(tripId));
   const [me, setMe] = useState(getName());
   const [editing, setEditing] = useState<Activity | 'new' | null>(null);
+  const [editingTrip, setEditingTrip] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [tab, setTab] = useState<'activities' | 'planning' | 'groceries'>('activities');
 
@@ -129,7 +131,12 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           ← Trips
         </button>
         <div className="trip-title">
-          <h1>{trip.name}</h1>
+          <h1>
+            {trip.name}{' '}
+            <button className="ghost edit-trip" title="Edit trip name, dates and description" onClick={() => setEditingTrip(true)}>
+              ✏️
+            </button>
+          </h1>
           <p className="muted">
             {trip.destination && `${trip.destination} · `}
             {formatDay(trip.start)} – {formatDay(trip.end)}
@@ -144,6 +151,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
               </span>
             ) : null}
           </p>
+          {trip.description && <p className="muted small trip-desc">{trip.description}</p>}
         </div>
         <ThemeToggle />
         <button className="primary" onClick={() => setSharing(true)}>
@@ -270,6 +278,17 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
             setEditing(null);
           }}
           onCancel={() => setEditing(null)}
+        />
+      )}
+
+      {editingTrip && (
+        <TripDetailsForm
+          trip={trip}
+          onSave={(next) => {
+            update(next);
+            setEditingTrip(false);
+          }}
+          onCancel={() => setEditingTrip(false)}
         />
       )}
 

@@ -69,6 +69,41 @@ describe('mergeTrips', () => {
     expect(merged.activities[0].deleted).toBe(true);
   });
 
+  it('lets a trip-details edit survive merging with a copy whose overall updatedAt is newer', () => {
+    // The other side is "newer" only because of an unrelated change (a vote,
+    // a grocery tick) — the deliberate rename must still win, both ways.
+    const renamed = makeTrip({ name: 'Elba 2027', metaUpdatedAt: 10, updatedAt: 10 });
+    const voted = makeTrip({ name: 'Trip', updatedAt: 50 });
+    expect(mergeTrips(renamed, voted).name).toBe('Elba 2027');
+    expect(mergeTrips(voted, renamed).name).toBe('Elba 2027');
+  });
+
+  it('lets the newer of two trip-details edits win as a block', () => {
+    const first = makeTrip({ name: 'First rename', description: 'Old blurb', metaUpdatedAt: 10 });
+    const second = makeTrip({ name: 'Second rename', start: '2026-08-03', end: '2026-08-09', metaUpdatedAt: 20 });
+    for (const merged of [mergeTrips(first, second), mergeTrips(second, first)]) {
+      expect(merged.name).toBe('Second rename');
+      expect(merged.start).toBe('2026-08-03');
+      expect(merged.end).toBe('2026-08-09');
+      // The winner controls all detail fields — its cleared description stays cleared.
+      expect(merged.description).toBeUndefined();
+      expect(merged.metaUpdatedAt).toBe(20);
+    }
+  });
+
+  it('lets a trip-details edit beat a pre-feature copy without metaUpdatedAt', () => {
+    const edited = makeTrip({ name: 'Corrected name', metaUpdatedAt: 5 });
+    const preFeature = makeTrip({ updatedAt: 99 });
+    expect(mergeTrips(edited, preFeature).name).toBe('Corrected name');
+    expect(mergeTrips(preFeature, edited).name).toBe('Corrected name');
+  });
+
+  it('resolves equal trip-details timestamps identically on both devices', () => {
+    const a = makeTrip({ name: 'Alpha', metaUpdatedAt: 7 });
+    const b = makeTrip({ name: 'Beta', metaUpdatedAt: 7 });
+    expect(mergeTrips(a, b).name).toBe(mergeTrips(b, a).name);
+  });
+
   it('reports trips as same regardless of activity order, different on content change', () => {
     const a1 = makeActivity({ id: 'a1' });
     const a2 = makeActivity({ id: 'a2' });

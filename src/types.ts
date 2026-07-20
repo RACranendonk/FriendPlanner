@@ -97,10 +97,19 @@ export interface Trip {
   id: string;
   name: string;
   destination: string;
+  /** Optional free-text blurb shown under the trip header. Absent on older trips. */
+  description?: string;
   /** ISO dates (yyyy-mm-dd), inclusive. */
   start: string;
   end: string;
   updatedAt: number;
+  /**
+   * When name/destination/dates/description last changed. Kept separate from
+   * updatedAt (which every change bumps) so a deliberate edit of the trip
+   * details can't lose a merge to an unrelated concurrent vote or grocery
+   * tick. Absent on copies from before trip editing existed.
+   */
+  metaUpdatedAt?: number;
   activities: Activity[];
   /** Accommodation candidates — absent on trips from before this feature. */
   stays?: Stay[];

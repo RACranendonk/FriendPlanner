@@ -12,7 +12,10 @@ like, and the group can see at a glance who's going where — including when you
 
 ## What's in it
 
-- **Trips** — a name, a destination, a date range, and one shared passphrase for the group.
+- **Trips** — a name, a destination, a date range, an optional description, and one shared
+  passphrase for the group. Typo in the name, dates shifted, or something to tell the group up
+  front? The ✏️ next to the trip title edits all of it later — and shrinking the dates never
+  loses activities, anything planned outside the new range stays in the plan under its own day.
 - **Activities** — title, category (🥾 hike, 🏛️ culture, 🍽️ food, 🏖️ beach, 🚵 sport,
   🌙 nightlife), day and time of day — plus an exact departure time once one is agreed
   ("Morning · 08:30") — notes, a place, and a link (Komoot, tickets, a website — shown labeled by
