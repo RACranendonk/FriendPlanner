@@ -37,7 +37,9 @@ like, and the group can see at a glance who's going where — including when you
   "I'll bring it" claims it (🎒) so nothing arrives in fivefold or not at all.
 - **Groceries tab** — a shared shopping list: add what the house needs (with a quantity), see who
   asked for it, cross things off as they're bought (or uncross them), and clear the bought ones
-  after a run.
+  after a run. "Sort by aisle" groups the list into store sections (fruit & veg, bakery, meat,
+  dairy, ...) in roughly the order you'd walk through a store — anything it can't recognize
+  (in-jokes, joke misspellings) just lands in "Other" instead of being guessed at.
 - **Trip map** — pin activities to a map (paste a Google Maps link, use "Find on map", or tap to
   place the pin) and see every pin together: tap one for the activity, its day, and who's going.
   A pinned activity also gets a 🧭 button that opens your phone's navigation app for turn-by-turn
