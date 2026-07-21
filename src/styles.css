@@ -615,18 +615,6 @@ footer {
   min-width: 6rem;
 }
 
-.grocery-aisle-group + .grocery-aisle-group {
-  margin-top: 0.9rem;
-}
-
-.grocery-aisle-group h3 {
-  margin: 0 0 0.2rem;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-}
-
 .grocery-list {
   list-style: none;
   margin: 0;

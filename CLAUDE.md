@@ -65,15 +65,7 @@ the relays).
   across the page (pure CSS, reduced-motion-aware). Deliberately not in the README — no spoilers.
 - `src/components/GroceriesSection.tsx` — shared shopping list (Groceries tab): add with
   quantity, cross off (LWW via item updatedAt), clear-bought via tombstones; merge in merge.ts
-  follows the stays pattern (explicit both-sides merge, pre-feature-copy safe). The "sort by
-  aisle" toggle is view-only component state (not synced) — it regroups the same items via
-  `src/lib/groceryCategories.ts`, never changes `GroceryItem` data.
-- `src/lib/groceryCategories.ts` — local keyword heuristic that buckets grocery item text into
-  store aisles (produce, bakery, meat, dairy, frozen, pantry, snacks, drinks, household, other)
-  in store-walk order. Exact/plural keyword phrase matches first, then one fuzzy
-  (edit-distance) pass on unmatched words for typos; anything still unmatched — including
-  in-jokes and deliberate misspellings — falls into "Other" rather than being guessed at. No
-  external classification call is made (would send list contents off-device).
+  follows the stays pattern (explicit both-sides merge, pre-feature-copy safe).
 - `src/lib/participation.ts` — who's-in listing and merge-safe withdrawal (in:false tombstone
   votes, never entry deletion — see the merge-safety comment there before changing it).
 - `src/lib/storage.ts` — localStorage wrapper (`fp.*` keys: name, trip index, trips, passphrases).
