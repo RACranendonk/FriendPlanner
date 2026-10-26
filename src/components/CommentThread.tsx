@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Comment } from '../types';
 
 /**
@@ -10,13 +10,21 @@ export function CommentThread({
   comments,
   me,
   onPost,
+  defaultOpen = false,
 }: {
   comments: Comment[];
   me: string;
   onPost: (text: string) => void;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [text, setText] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Opened on purpose to read the discussion — it sits at the bottom of the card, so bring it into view.
+  useEffect(() => {
+    if (defaultOpen) ref.current?.scrollIntoView({ block: 'nearest' });
+  }, [defaultOpen]);
 
   const submit = () => {
     if (!text.trim()) return;
@@ -25,7 +33,7 @@ export function CommentThread({
   };
 
   return (
-    <div className="comments">
+    <div className="comments" ref={ref}>
       <button className="linklike small" onClick={() => setOpen((v) => !v)}>
         💬 {comments.length > 0 ? `${comments.length} ${comments.length === 1 ? 'comment' : 'comments'}` : 'Comment'}
       </button>

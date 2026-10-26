@@ -29,6 +29,7 @@ export function StaysSection({
 }) {
   const [editing, setEditing] = useState<Stay | 'new' | null>(null);
   const [openStayId, setOpenStayId] = useState<string | null>(null);
+  const [openToComments, setOpenToComments] = useState(false);
   const [managingFields, setManagingFields] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
@@ -182,7 +183,10 @@ export function StaysSection({
           anyDecided={anyDecided}
           topAverage={topAverage}
           topIsUnique={topIsUnique}
-          onOpen={(stay) => setOpenStayId(stay.id)}
+          onOpen={(stay, toComments = false) => {
+            setOpenToComments(toComments);
+            setOpenStayId(stay.id);
+          }}
         />
       )}
 
@@ -190,6 +194,7 @@ export function StaysSection({
         <StayDetail
           stay={openStay}
           me={me}
+          showComments={openToComments}
           highlight={!anyDecided && topIsUnique && !openStay.decided && averageRating(openStay) === topAverage}
           onRate={(score) => rate(openStay, score)}
           onComment={(text) => addComment(openStay, text)}
@@ -281,7 +286,7 @@ function StaysTable({
   anyDecided: boolean;
   topAverage: number | null;
   topIsUnique: boolean;
-  onOpen: (stay: Stay) => void;
+  onOpen: (stay: Stay, toComments?: boolean) => void;
 }) {
   return (
     <div className="stays-table-wrap">
@@ -327,7 +332,7 @@ function StaysTable({
                 ))}
                 <td className="center">
                   {discussion.count > 0 ? (
-                    <button className="linklike comment-count" title={discussionTooltip(discussion)} onClick={() => onOpen(stay)}>
+                    <button className="linklike comment-count" title={discussionTooltip(discussion)} onClick={() => onOpen(stay, true)}>
                       💬 {discussion.count}
                     </button>
                   ) : (
@@ -347,6 +352,7 @@ function StaysTable({
 function StayDetail({
   stay,
   me,
+  showComments,
   highlight,
   onRate,
   onComment,
@@ -357,6 +363,7 @@ function StayDetail({
 }: {
   stay: Stay;
   me: string;
+  showComments: boolean;
   highlight: boolean;
   onRate: (score: number) => void;
   onComment: (text: string) => void;
@@ -418,7 +425,7 @@ function StayDetail({
           ))}
         </div>
 
-        <CommentThread comments={stay.comments} me={me} onPost={onComment} />
+        <CommentThread comments={stay.comments} me={me} onPost={onComment} defaultOpen={showComments} />
 
         <div className="activity-actions">
           <div className="rating-row" title={me ? 'How do you feel about this place?' : 'Enter your name above to rate'}>
