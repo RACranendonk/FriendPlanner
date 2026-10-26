@@ -34,7 +34,9 @@ like, and the group can see at a glance who's going where — including when you
   and crown the winner with a 🏆 when it's settled. Options show as a compact comparison table —
   cost, location, rating, and any custom columns the group adds (e.g. "Good game table?", since
   not every trip cares about the same things) — so candidates are easy to scan side by side; tap
-  an option to open its full details, ratings, and discussion. Lives in its own tab so the
+  an option to open its full details, ratings, and discussion. A toggle-able map plots every
+  pinned option together, so the group can see how the candidates sit relative to each other
+  before deciding. Lives in its own tab so the
   activity schedule stays front and center. The same tab holds the **bringing-from-home list**:
   the scale, the salt & pepper, the board games — anyone can add what's needed, and a tap on
   "I'll bring it" claims it (🎒) so nothing arrives in fivefold or not at all.

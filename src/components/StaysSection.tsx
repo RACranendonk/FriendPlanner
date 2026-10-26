@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { Stay, StayFieldDef, Trip } from '../types';
 import { linkInfo } from '../lib/linkinfo';
 import { geocode, isValidCoords, navUrl, type LatLng } from '../lib/geo';
-import { MapView } from './MapView';
+import { MapView, type MapPin } from './MapView';
 import { CommentThread } from './CommentThread';
 import { RATING_CLEARED, RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
 
@@ -29,6 +29,7 @@ export function StaysSection({
   const [editing, setEditing] = useState<Stay | 'new' | null>(null);
   const [openStayId, setOpenStayId] = useState<string | null>(null);
   const [managingFields, setManagingFields] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const fields = (trip.stayFields ?? []).filter((f) => !f.deleted);
   const visible = (trip.stays ?? []).filter((s) => !s.deleted);
@@ -56,6 +57,32 @@ export function StaysSection({
   const averages = stays.filter((s) => !s.decided).map((s) => averageRating(s)).filter((a): a is number => a !== null);
   const topAverage = averages.length > 0 ? Math.max(...averages) : null;
   const topIsUnique = averages.filter((a) => a === topAverage).length === 1;
+
+  // So attendees can get a feel for where the candidates sit relative to each
+  // other (and to the activities) before deciding — same pattern as the trip
+  // map for activities.
+  const mapPins = useMemo<MapPin[]>(
+    () =>
+      stays
+        .filter((s) => s.lat != null && s.lng != null && isValidCoords(s.lat, s.lng))
+        .map((s) => {
+          const average = averageRating(s);
+          return {
+            id: s.id,
+            lat: s.lat!,
+            lng: s.lng!,
+            emoji: s.decided ? '🏆' : '🏠',
+            title: s.title,
+            subtitle: [
+              s.cost != null ? `${s.cost.toLocaleString()} total` : null,
+              average !== null ? `${ratingEmoji(average)} ${average.toFixed(1)}` : null,
+            ]
+              .filter((part): part is string => part !== null)
+              .join(' · '),
+          };
+        }),
+    [stays],
+  );
 
   const upsert = (stay: Stay) => {
     onUpdate({ ...trip, stays: [...(trip.stays ?? []).filter((s) => s.id !== stay.id), stay] });
@@ -118,6 +145,9 @@ export function StaysSection({
       <div className="section-head">
         <h2>Where we stay</h2>
         <div className="row">
+          <button className="ghost" onClick={() => setShowMap((v) => !v)}>
+            {showMap ? 'Hide map' : `🗺️ Map (${mapPins.length})`}
+          </button>
           <button className="ghost" onClick={() => setManagingFields((v) => !v)}>
             ⚙️ Fields
           </button>
@@ -126,6 +156,15 @@ export function StaysSection({
           </button>
         </div>
       </div>
+
+      {showMap &&
+        (mapPins.length > 0 ? (
+          <MapView pins={mapPins} height={300} />
+        ) : (
+          <p className="muted small">
+            No options pinned yet — add a place when adding or editing an option.
+          </p>
+        ))}
 
       {managingFields && (
         <FieldsManager fields={fields} onAdd={addField} onRemove={removeField} />
