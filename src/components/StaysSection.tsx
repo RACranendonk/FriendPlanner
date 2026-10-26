@@ -326,8 +326,8 @@ function StaysTable({
                   {stay.locationName || (hasPin ? '📍 Pinned location' : '—')}
                 </td>
                 {fields.map((f) => (
-                  <td key={f.id} className="center">
-                    {stay.customValues?.[f.id] ? '✅' : '—'}
+                  <td key={f.id} className="center" title={`${f.label} ${stay.customValues?.[f.id] ? 'yes' : 'no'}`}>
+                    {stay.customValues?.[f.id] ? '✅' : '❌'}
                   </td>
                 ))}
                 <td className="center">

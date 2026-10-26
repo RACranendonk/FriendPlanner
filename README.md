@@ -35,8 +35,8 @@ like, and the group can see at a glance who's going where — including when you
   each option on a five-point scale (🤮 to 😍, with the group average shown), discuss in comments,
   and crown the winner with a 🏆 when it's settled. Options show as a compact comparison table —
   cost, location, rating, a 💬 comment count (so you can see where the discussion is happening;
-  hover it to see who commented last), and any custom columns the group adds (e.g. "Good game table?", since
-  not every trip cares about the same things) — so candidates are easy to scan side by side; tap
+  hover it to see who commented last), and any custom yes/no columns the group adds (e.g. "Good
+  game table?", since not every trip cares about the same things; ✅ or ❌ per option) — so candidates are easy to scan side by side; tap
   an option to open its full details, ratings, and discussion. A toggle-able map plots every
   pinned option together, so the group can see how the candidates sit relative to each other
   before deciding. Lives in its own tab so the
