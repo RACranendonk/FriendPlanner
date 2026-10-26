@@ -403,6 +403,10 @@ function StayDetail({
                 <button className="linklike" onClick={() => setShowMap((v) => !v)}>
                   {showMap ? 'hide map' : 'show map'}
                 </button>
+                {' · '}
+                <a href={navUrl(stay.lat!, stay.lng!)} title="Open in your navigation app">
+                  🧭 navigate there
+                </a>
               </>
             )}
           </p>
@@ -443,11 +447,6 @@ function StayDetail({
             ))}
           </div>
           <span className="spacer" />
-          {hasPin && (
-            <a className="linkbtn" href={navUrl(stay.lat!, stay.lng!)} title="Navigate there">
-              🧭
-            </a>
-          )}
           <button className="ghost" title={stay.decided ? 'Un-decide' : 'Crown as the choice'} onClick={onDecide}>
             {stay.decided ? 'Un-decide' : '🏆 Decide'}
           </button>
