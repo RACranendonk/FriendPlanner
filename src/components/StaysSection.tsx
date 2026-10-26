@@ -294,7 +294,7 @@ function StaysTable({
         <thead>
           <tr>
             <th>Option</th>
-            <th>Cost</th>
+            <th className="num">Cost</th>
             <th>Location</th>
             {fields.map((f) => (
               <th key={f.id} className="center" title={f.label}>
@@ -304,7 +304,7 @@ function StaysTable({
             <th className="center" title="Comments">
               💬
             </th>
-            <th>Rating</th>
+            <th className="num">Rating</th>
           </tr>
         </thead>
         <tbody>

@@ -699,7 +699,7 @@ footer {
 }
 
 .stays-table td.num,
-.stays-table th:nth-child(2) {
+.stays-table th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
