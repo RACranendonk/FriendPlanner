@@ -161,11 +161,18 @@ export function createDemoTrip(): Trip {
         createdBy: 'Charlie',
       }),
     ],
-    stays: demoStays(now),
+    stays: demoStays(now, GAME_TABLE_FIELD_ID),
+    stayFields: [
+      { id: GAME_TABLE_FIELD_ID, label: 'Good game table', createdBy: 'Billie', createdAt: now - 7_000_000, updatedAt: now - 7_000_000 },
+    ],
     groceries: demoGroceries(now),
     bring: demoBring(now),
   };
 }
+
+// Not a real synced id (demo trips never sync) — just a stable key linking
+// demoStays' customValues to the field definition above.
+const GAME_TABLE_FIELD_ID = 'demo-game-table';
 
 function demoBring(now: number): BringItem[] {
   let order = 0;
@@ -215,7 +222,7 @@ function demoGroceries(now: number): GroceryItem[] {
   ];
 }
 
-function demoStays(now: number): Stay[] {
+function demoStays(now: number, gameTableFieldId: string): Stay[] {
   const stay = (partial: Omit<Stay, 'id' | 'updatedAt'>, age: number): Stay => ({
     ...partial,
     id: crypto.randomUUID(),
@@ -227,6 +234,11 @@ function demoStays(now: number): Stay[] {
         title: 'Agriturismo with pool near Greve',
         url: 'https://www.airbnb.com/s/Greve-in-Chianti--Italy/homes',
         details: '€38 pp/night · 6 beds · pool · 40 min drive to Florence',
+        cost: 1064,
+        locationName: 'Greve in Chianti, Italy',
+        lat: 43.5804,
+        lng: 11.3031,
+        customValues: { [gameTableFieldId]: false },
         votes: {},
         ratings: ratings(['Alex', 5], ['Billie', 5], ['Dana', 4], ['Charlie', 2]),
         comments: comments(
@@ -243,6 +255,11 @@ function demoStays(now: number): Stay[] {
         title: 'Apartment in Florence centre',
         url: 'https://www.booking.com/city/it/florence.html',
         details: '€45 pp/night · 5 beds · everything walkable',
+        cost: 1260,
+        locationName: 'Florence, Italy',
+        lat: 43.7696,
+        lng: 11.2558,
+        customValues: { [gameTableFieldId]: true },
         votes: {},
         ratings: ratings(['Charlie', 5], ['Dana', 2], ['Alex', 3]),
         comments: comments(['Charlie', 'We can stumble home from anywhere'], ['Dana', 'No pool, no deal 🏊']),
@@ -255,6 +272,11 @@ function demoStays(now: number): Stay[] {
         title: 'Villa with own vineyard, San Gimignano',
         url: 'https://www.airbnb.com/s/San-Gimignano--Italy/homes',
         details: '€52 pp/night · 8 beds · vineyard(!) · quite remote',
+        cost: 1456,
+        locationName: 'San Gimignano, Italy',
+        lat: 43.4679,
+        lng: 11.0431,
+        customValues: { [gameTableFieldId]: true },
         votes: {},
         ratings: ratings(['Dana', 5], ['Billie', 3], ['Charlie', 2]),
         comments: comments(['Dana', 'It. Has. A. Vineyard.']),

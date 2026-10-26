@@ -29,9 +29,12 @@ like, and the group can see at a glance who's going where — including when you
 - **Ideas pile** — activities without a day yet sit at the top of the plan: they're the ones that
   still need a decision.
 - **Planning tab** — before the activities, decide the trip itself: collect accommodation
-  candidates (Airbnb, Booking, anything with a link), rate each option on a five-point scale
-  (🤮 to 😍, with the group average shown), discuss in comments, and crown the winner with a 🏆
-  when it's settled. Lives in its own tab so the
+  candidates (Airbnb, Booking, anything with a link) with a total cost and a location pin, rate
+  each option on a five-point scale (🤮 to 😍, with the group average shown), discuss in comments,
+  and crown the winner with a 🏆 when it's settled. Options show as a compact comparison table —
+  cost, location, rating, and any custom columns the group adds (e.g. "Good game table?", since
+  not every trip cares about the same things) — so candidates are easy to scan side by side; tap
+  an option to open its full details, ratings, and discussion. Lives in its own tab so the
   activity schedule stays front and center. The same tab holds the **bringing-from-home list**:
   the scale, the salt & pepper, the board games — anyone can add what's needed, and a tap on
   "I'll bring it" claims it (🎒) so nothing arrives in fivefold or not at all.

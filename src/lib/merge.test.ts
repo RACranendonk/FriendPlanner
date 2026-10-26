@@ -291,4 +291,68 @@ describe('mergeTrips: stays', () => {
     const incoming = makeTrip({ stays: [makeStay({ updatedAt: 1 })] });
     expect(mergeTrips(local, incoming).stays![0].deleted).toBe(true);
   });
+
+  it('lets the newer edit win on cost, location, and custom field values', () => {
+    const local = makeTrip({
+      stays: [
+        makeStay({
+          updatedAt: 2,
+          cost: 900,
+          locationName: 'Old town',
+          lat: 1,
+          lng: 1,
+          customValues: { pool: false },
+        }),
+      ],
+    });
+    const incoming = makeTrip({
+      stays: [
+        makeStay({
+          updatedAt: 9,
+          cost: 1200,
+          locationName: 'New town',
+          lat: 2,
+          lng: 2,
+          customValues: { pool: true },
+        }),
+      ],
+    });
+    const merged = mergeTrips(local, incoming).stays![0];
+    expect(merged.cost).toBe(1200);
+    expect(merged.locationName).toBe('New town');
+    expect(merged.lat).toBe(2);
+    expect(merged.lng).toBe(2);
+    expect(merged.customValues).toEqual({ pool: true });
+  });
+});
+
+describe('mergeTrips: stay fields', () => {
+  const makeField = (overrides: Partial<import('../types').StayFieldDef> = {}): import('../types').StayFieldDef => ({
+    id: 'f1',
+    label: 'Good game table',
+    createdBy: 'Alex',
+    createdAt: 1,
+    updatedAt: 1,
+    ...overrides,
+  });
+
+  it('unions fields added independently on both sides and survives pre-feature copies', () => {
+    const local = makeTrip({ stayFields: [makeField({ id: 'f1' })] });
+    const incoming = makeTrip({ stayFields: [makeField({ id: 'f2', label: 'Parking' })] });
+    expect(
+      mergeTrips(local, incoming)
+        .stayFields!.map((f) => f.id)
+        .sort(),
+    ).toEqual(['f1', 'f2']);
+
+    const preFeature = makeTrip({ updatedAt: 9 });
+    delete (preFeature as Partial<Trip>).stayFields;
+    expect(mergeTrips(preFeature, local).stayFields!.length).toBe(1);
+  });
+
+  it('keeps a removed field gone via its tombstone', () => {
+    const removed = makeTrip({ stayFields: [makeField({ deleted: true, updatedAt: 9 })] });
+    const stale = makeTrip({ stayFields: [makeField({ updatedAt: 5 })] });
+    expect(mergeTrips(stale, removed).stayFields![0].deleted).toBe(true);
+  });
 });

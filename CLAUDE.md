@@ -38,7 +38,11 @@ and Nominatim geocoding, both keyless public OSM infrastructure in the same comm
 the relays).
 
 - `src/types.ts` — `Trip`/`Activity`/`Vote` model plus category/slot constants and date helpers.
-  Votes are per-person `{in, ts}` records so merges keep each person's latest choice.
+  Votes are per-person `{in, ts}` records so merges keep each person's latest choice. `Stay` also
+  carries `cost` (total for the whole stay), `locationName`/`lat`/`lng` (same pin shape as
+  Activity), and `customValues` keyed by `StayFieldDef.id` — trip-wide yes/no columns the group
+  defines itself (`Trip.stayFields`) since not every trip cares about the same things (e.g. "Good
+  game table?").
 - `src/lib/crypto.ts` — JSON → deflate → AES-GCM (key from passphrase via PBKDF2, fresh salt/iv
   per token) → base64url. Requires a secure context (localhost or HTTPS; `file://` won't work).
 - `src/lib/share.ts` — `FP1_`-prefixed token pack/unpack, token extraction from pasted text.
@@ -52,7 +56,10 @@ the relays).
 - `src/lib/merge.ts` — merges two copies of a trip: newer activity/stay edit wins, votes merge
   per-person by timestamp, comments (on activities and stays) union append-only by id, deletions
   survive via tombstones (`deleted: true`, never hard-remove). Stays merge explicitly from both
-  sides so pre-feature copies can't wipe them.
+  sides so pre-feature copies can't wipe them; a stay's scalar fields (cost, location,
+  customValues) ride along with whichever side's `updatedAt` is newer, same as title/details.
+  `stayFields` (the custom column definitions) merge like groceries/bring — LWW list with
+  tombstones.
 - `src/lib/grouping.ts` — trip-view day grouping: unscheduled bucket first, popularity-first sort
   within a group, unique-winner `topId` for the subtle highlight.
 - `src/lib/linkinfo.ts` — labels activity links by target site (Komoot/Google Maps/…, hostname

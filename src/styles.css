@@ -596,6 +596,78 @@ footer {
   font-size: 0.85rem;
 }
 
+/* ---- stays comparison table ---- */
+
+.stays-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.6rem;
+}
+
+.stays-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.stays-table th,
+.stays-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.stays-table th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.stays-table td.num,
+.stays-table th:nth-child(2) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stays-table td.center {
+  text-align: center;
+}
+
+.stays-table td.truncate {
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stays-table tbody tr:hover {
+  background: var(--bg);
+}
+
+.stays-table tr.decided {
+  background: color-mix(in srgb, var(--card) 92%, var(--success));
+}
+
+.fields-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.checkbox-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.checkbox-chip input {
+  width: auto;
+  margin: 0;
+}
+
 /* ---- groceries ---- */
 
 .grocery-add {

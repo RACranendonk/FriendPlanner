@@ -72,6 +72,7 @@ export function sameTrip(a: Trip, b: Trip): boolean {
       ...t,
       activities: [...t.activities].sort(byId),
       stays: [...(t.stays ?? [])].sort(byId),
+      stayFields: [...(t.stayFields ?? [])].sort(byId),
       groceries: [...(t.groceries ?? [])].sort(byId),
       bring: [...(t.bring ?? [])].sort(byId),
     });
@@ -127,6 +128,7 @@ export function mergeTrips(local: Trip, incoming: Trip): Trip {
     // Explicitly merged from both sides — never inherited from `meta`, so a
     // copy that predates the stays feature can't wipe the other side's stays.
     stays: mergeStays(local.stays, incoming.stays),
+    stayFields: mergeLwwList(local.stayFields, incoming.stayFields),
     groceries: mergeLwwList(local.groceries, incoming.groceries),
     bring: mergeLwwList(local.bring, incoming.bring),
     visited: mergeVotes(local.visited ?? {}, incoming.visited ?? {}),

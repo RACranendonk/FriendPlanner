@@ -50,8 +50,16 @@ export interface Stay {
   id: string;
   title: string;
   url: string;
-  /** Free-text facts: price, beds, distance to town, … (no scraping — entered by hand). */
+  /** Free-text facts: price per night, beds, distance to town, … (no scraping — entered by hand). */
   details: string;
+  /** Total cost for the entire stay (not per night/person) — kept numeric so options sort/compare. */
+  cost?: number;
+  locationName?: string;
+  /** Optional map pin, same shape as Activity's. Absent on options nobody has located yet. */
+  lat?: number;
+  lng?: number;
+  /** Values for the trip's custom fields (see Trip.stayFields), keyed by field id. */
+  customValues?: Record<string, boolean>;
   /** Legacy binary votes — superseded by ratings but still merged; in:true reads as a 4. */
   votes: Record<string, Vote>;
   /** Per-person 1–5 scores. Overrides a person's legacy vote. */
@@ -60,6 +68,21 @@ export interface Stay {
   /** The crowned choice. LWW via updatedAt like other stay fields. */
   decided?: boolean;
   createdBy: string;
+  updatedAt: number;
+  deleted?: boolean;
+}
+
+/**
+ * A group-defined yes/no column for comparing stays (e.g. "Good game table?")
+ * — not every trip cares about the same things, so these are trip-specific
+ * rather than built into the Stay shape. Merges like groceries/bring: union by
+ * id, newer wins, tombstoned on removal.
+ */
+export interface StayFieldDef {
+  id: string;
+  label: string;
+  createdBy: string;
+  createdAt: number;
   updatedAt: number;
   deleted?: boolean;
 }
@@ -115,6 +138,8 @@ export interface Trip {
   activities: Activity[];
   /** Accommodation candidates — absent on trips from before this feature. */
   stays?: Stay[];
+  /** Custom comparison columns for stays (e.g. "Good game table?") — absent on trips from before this feature. */
+  stayFields?: StayFieldDef[];
   /** Shared shopping list — absent on trips from before this feature. */
   groceries?: GroceryItem[];
   /** Bringing-from-home list — absent on trips from before this feature. */
