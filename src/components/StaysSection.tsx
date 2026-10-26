@@ -297,7 +297,7 @@ function StaysTable({
             <th>Cost</th>
             <th>Location</th>
             {fields.map((f) => (
-              <th key={f.id} title={f.label}>
+              <th key={f.id} className="center" title={f.label}>
                 {f.label}
               </th>
             ))}
