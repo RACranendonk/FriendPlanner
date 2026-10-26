@@ -6,6 +6,7 @@ import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassp
 import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
 import { CompassEgg } from './Llama';
 import { ThemeToggle } from './ThemeToggle';
+import { LayoutToggle } from './LayoutToggle';
 import { Credits } from './Credits';
 
 export function Home({
@@ -49,6 +50,7 @@ export function Home({
     <div className="page">
       <header className="hero">
         <div className="hero-top">
+          <LayoutToggle />
           <ThemeToggle />
         </div>
         <h1>

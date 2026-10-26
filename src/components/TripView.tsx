@@ -8,6 +8,7 @@ import { StaysSection } from './StaysSection';
 import { GroceriesSection } from './GroceriesSection';
 import { BringSection } from './BringSection';
 import { ThemeToggle } from './ThemeToggle';
+import { LayoutToggle } from './LayoutToggle';
 import { emptyDayMessage } from '../lib/copy';
 import { getName, getPassphrase, loadTrip, saveTrip, setName } from '../lib/storage';
 import { isValidCoords } from '../lib/geo';
@@ -51,7 +52,8 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   });
 
   const groups = useMemo(() => (trip ? groupActivities(trip) : []), [trip]);
-  const [showTripMap, setShowTripMap] = useState(false);
+  // The wide layout has a sidebar with room to spare, so the map starts open there.
+  const [showTripMap, setShowTripMap] = useState(() => document.documentElement.dataset.layout === 'wide');
   const pins = useMemo<MapPin[]>(
     () =>
       (trip?.activities ?? [])
@@ -146,7 +148,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
   };
 
   return (
-    <div className="page">
+    <div className="page trip-page">
       <header className="trip-header">
         <button className="ghost" onClick={onBack}>
           ← Trips
@@ -174,6 +176,7 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           </p>
           {trip.description && <p className="muted small trip-desc">{trip.description}</p>}
         </div>
+        <LayoutToggle />
         <ThemeToggle />
         {!trip.demo && (
           <button className="primary" onClick={() => setSharing(true)}>
@@ -218,83 +221,91 @@ export function TripView({ tripId, onBack }: { tripId: string; onBack: () => voi
           <BringSection trip={trip} me={me.trim()} onUpdate={update} />
         </>
       )}
-      {tab === 'groceries' && <GroceriesSection trip={trip} me={me.trim()} onUpdate={update} />}
+      {tab === 'groceries' && (
+        <div className="list-column">
+          <GroceriesSection trip={trip} me={me.trim()} onUpdate={update} />
+        </div>
+      )}
 
       {tab === 'activities' && (
-        <>
-      <section className="card">
-        <div className="section-head">
-          <h2>Trip map</h2>
-          <button className="ghost" onClick={() => setShowTripMap((v) => !v)}>
-            {showTripMap ? 'Hide' : `Show map (${pins.length} pinned)`}
-          </button>
-        </div>
-        {showTripMap &&
-          (pins.length > 0 ? (
-            <MapView pins={pins} height={380} />
-          ) : (
-            <p className="muted small">
-              No pinned activities yet — use "Find on map" when adding or editing an activity.
-            </p>
-          ))}
-      </section>
-
-      {participants.length > 0 && (
-        <section className="card">
-          <h2>Who's in</h2>
-          <div className="going-row">
-            {participants.map((person) => (
-              <span key={person} className={`chip person ${person === me.trim() ? 'is-me' : ''}`}>
-                {person}
-                <button
-                  className="chip-x"
-                  title={`Remove ${person} from the list`}
-                  onClick={() => removeParticipation(person)}
-                >
-                  ✕
+        <div className="activities-layout">
+          <aside className="activities-side">
+            <section className="card">
+              <div className="section-head">
+                <h2>Trip map</h2>
+                <button className="ghost" onClick={() => setShowTripMap((v) => !v)}>
+                  {showTripMap ? 'Hide' : `Show map (${pins.length} pinned)`}
                 </button>
-              </span>
-            ))}
-          </div>
-          <p className="muted small">
-            Everyone who's opened the trip or joined an activity. Removing someone clears their "I'm in" everywhere —
-            activities they suggested stay in the plan.
-          </p>
-        </section>
-      )}
-
-      <div className="toolbar">
-        <button className="primary wide" onClick={() => setEditing('new')}>
-          ＋ Add activity
-        </button>
-      </div>
-
-      {groups.map(
-        (group) =>
-          (group.items.length > 0 || group.day !== null) && (
-            <section key={group.day ?? 'unscheduled'} className="day-group">
-              <h2>{group.label}</h2>
-              {group.items.length === 0 ? (
-                <p className="muted small">{emptyDayMessage(`${trip.id}:${group.day}`)}</p>
-              ) : (
-                group.items.map((act) => (
-                  <ActivityCard
-                    key={act.id}
-                    activity={act}
-                    me={me.trim()}
-                    highlight={act.id === group.topId}
-                    calendarUrl={googleCalendarUrl(trip, act)}
-                    onToggle={() => toggleVote(act)}
-                    onComment={(text) => commentOnActivity(act, text)}
-                    onEdit={() => setEditing(act)}
-                    onDelete={() => removeActivity(act)}
-                  />
-                ))
-              )}
+              </div>
+              {showTripMap &&
+                (pins.length > 0 ? (
+                  <MapView pins={pins} height={380} />
+                ) : (
+                  <p className="muted small">
+                    No pinned activities yet — use "Find on map" when adding or editing an activity.
+                  </p>
+                ))}
             </section>
-          ),
-      )}
-        </>
+
+            {participants.length > 0 && (
+              <section className="card">
+                <h2>Who's in</h2>
+                <div className="going-row">
+                  {participants.map((person) => (
+                    <span key={person} className={`chip person ${person === me.trim() ? 'is-me' : ''}`}>
+                      {person}
+                      <button
+                        className="chip-x"
+                        title={`Remove ${person} from the list`}
+                        onClick={() => removeParticipation(person)}
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <p className="muted small">
+                  Everyone who's opened the trip or joined an activity. Removing someone clears their "I'm in" everywhere —
+                  activities they suggested stay in the plan.
+                </p>
+              </section>
+            )}
+          </aside>
+
+          <div className="activities-main">
+            <div className="toolbar">
+              <button className="primary wide" onClick={() => setEditing('new')}>
+                ＋ Add activity
+              </button>
+            </div>
+
+            {groups.map(
+              (group) =>
+                (group.items.length > 0 || group.day !== null) && (
+                  <section key={group.day ?? 'unscheduled'} className="day-group">
+                    <h2>{group.label}</h2>
+                    {group.items.length === 0 ? (
+                      <p className="muted small">{emptyDayMessage(`${trip.id}:${group.day}`)}</p>
+                    ) : (
+                      group.items.map((act) => (
+                        <ActivityCard
+                          key={act.id}
+                          activity={act}
+                          me={me.trim()}
+                          highlight={act.id === group.topId}
+                          calendarUrl={googleCalendarUrl(trip, act)}
+                          onToggle={() => toggleVote(act)}
+                          onComment={(text) => commentOnActivity(act, text)}
+                          onEdit={() => setEditing(act)}
+                          onDelete={() => removeActivity(act)}
+                        />
+                      ))
+                    )}
+                  </section>
+                ),
+            )}
+          </div>
+        </div>
       )}
 
       {editing && (

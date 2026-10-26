@@ -96,6 +96,67 @@ h1 {
   padding: 0.35rem 0.5rem;
 }
 
+/* ---- layout (data-layout on <html>, resolved by src/lib/layout.ts) ---- */
+
+/* Pointless on a phone, but stays reachable if someone forced "wide" and then shrank the window. */
+.layout-toggle {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .layout-toggle {
+    display: inline-block;
+  }
+}
+
+:root[data-layout='wide'] .layout-toggle {
+  display: inline-block;
+}
+
+.activities-layout,
+.activities-side,
+.activities-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+:root[data-layout='wide'] {
+  font-size: 106.25%;
+}
+
+:root[data-layout='wide'] .page.trip-page {
+  max-width: 1240px;
+  padding-inline: 2rem;
+}
+
+:root[data-layout='wide'] .activities-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+:root[data-layout='wide'] .activities-main {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+:root[data-layout='wide'] .activities-side {
+  grid-column: 2;
+  grid-row: 1;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+:root[data-layout='wide'] .list-column {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
 h2 {
   font-size: 1.05rem;
   margin: 0 0 0.5rem;

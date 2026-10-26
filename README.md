@@ -53,6 +53,10 @@ like, and the group can see at a glance who's going where — including when you
 - **Your look** — follows your phone's light/dark setting by default; the 🌗 button switches
   between light, dark, and follow-device whenever you prefer otherwise. Activity cards carry a
   color edge per category, so a hike day and a museum day look different at a glance.
+- **Big-screen layout** — on a PC the page spreads out: activities sit next to a sidebar with
+  the trip map (open by default) and who's in, and the text is a touch larger. The 🖥️ button
+  (only shown on big screens) switches between wide-on-big-screens, always wide (↔️), and always
+  compact (📱, the phone layout). Like the theme, it's remembered per device.
 - **Add to calendar** — planned activities have a 📅 button that opens a prefilled Google
   Calendar event (uses the departure time when set, otherwise a sensible window for the time of
   day).

@@ -44,7 +44,11 @@ export function MapView({
     map.on('click', (e: L.LeafletMouseEvent) => onPickRef.current?.(e.latlng.lat, e.latlng.lng));
     layerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
+    // Leaflet only measures its container on creation; switching layouts resizes it later.
+    const resize = new ResizeObserver(() => map.invalidateSize());
+    resize.observe(divRef.current);
     return () => {
+      resize.disconnect();
       map.remove();
       mapRef.current = null;
       layerRef.current = null;
