@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Trip } from '../types';
-import { formatDay } from '../types';
+import { formatDay, sortTripsByStart } from '../types';
 import { extractToken } from '../lib/share';
 import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
 import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
@@ -18,9 +18,11 @@ export function Home({
 }) {
   const [name, setNameState] = useState(getName());
   const [trips, setTrips] = useState<Trip[]>(() =>
-    listTripIds()
-      .map(loadTrip)
-      .filter((t): t is Trip => t !== null),
+    sortTripsByStart(
+      listTripIds()
+        .map(loadTrip)
+        .filter((t): t is Trip => t !== null),
+    ),
   );
   const [creating, setCreating] = useState(false);
   const [joinText, setJoinText] = useState('');

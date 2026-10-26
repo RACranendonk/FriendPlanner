@@ -189,6 +189,14 @@ export function tripDays(trip: Trip): string[] {
   return days;
 }
 
+/** Earliest start first; trips without a start date go last. ISO dates sort correctly as plain strings. */
+export function sortTripsByStart(trips: Trip[]): Trip[] {
+  return [...trips].sort(
+    (a, b) =>
+      Number(!a.start) - Number(!b.start) || a.start.localeCompare(b.start) || a.name.localeCompare(b.name),
+  );
+}
+
 export function formatDay(iso: string): string {
   return new Date(iso + 'T12:00:00').toLocaleDateString(undefined, {
     weekday: 'short',
