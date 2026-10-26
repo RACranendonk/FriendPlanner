@@ -5,6 +5,7 @@ import { geocode, isValidCoords, navUrl, type LatLng } from '../lib/geo';
 import { MapView, type MapPin } from './MapView';
 import { CommentThread } from './CommentThread';
 import { RATING_CLEARED, RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
+import { discussionTooltip, summarizeComments } from '../lib/discussion';
 
 /**
  * Accommodation candidates: share options, vote, argue in comments, crown a
@@ -295,6 +296,9 @@ function StaysTable({
                 {f.label}
               </th>
             ))}
+            <th className="center" title="Comments">
+              💬
+            </th>
             <th>Rating</th>
           </tr>
         </thead>
@@ -303,6 +307,7 @@ function StaysTable({
             const average = averageRating(stay);
             const hasPin = stay.lat != null && stay.lng != null && isValidCoords(stay.lat, stay.lng);
             const highlight = !anyDecided && topIsUnique && !stay.decided && average === topAverage;
+            const discussion = summarizeComments(stay.comments);
             return (
               <tr key={stay.id} className={stay.decided ? 'decided' : highlight ? 'popular' : ''}>
                 <td>
@@ -320,6 +325,15 @@ function StaysTable({
                     {stay.customValues?.[f.id] ? '✅' : '—'}
                   </td>
                 ))}
+                <td className="center">
+                  {discussion.count > 0 ? (
+                    <button className="linklike comment-count" title={discussionTooltip(discussion)} onClick={() => onOpen(stay)}>
+                      💬 {discussion.count}
+                    </button>
+                  ) : (
+                    '—'
+                  )}
+                </td>
                 <td className="num">{average !== null ? `${ratingEmoji(average)} ${average.toFixed(1)}` : '—'}</td>
               </tr>
             );

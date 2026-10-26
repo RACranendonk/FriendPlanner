@@ -690,8 +690,13 @@ footer {
   font-variant-numeric: tabular-nums;
 }
 
-.stays-table td.center {
+.stays-table td.center,
+.stays-table th.center {
   text-align: center;
+}
+
+.stays-table .comment-count {
+  font-variant-numeric: tabular-nums;
 }
 
 .stays-table td.truncate {
