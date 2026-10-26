@@ -41,7 +41,7 @@ the relays).
 
 - `src/types.ts` — `Trip`/`Activity`/`Vote` model plus category/slot constants and date helpers.
   Votes are per-person `{in, ts}` records so merges keep each person's latest choice. `Stay` also
-  carries `cost` (total for the whole stay), `locationName`/`lat`/`lng` (same pin shape as
+  carries `cost` (total for the whole stay, in €), `bedrooms`/`bathrooms`, `locationName`/`lat`/`lng` (same pin shape as
   Activity), and `customValues` keyed by `StayFieldDef.id` — trip-wide yes/no columns the group
   defines itself (`Trip.stayFields`) since not every trip cares about the same things (e.g. "Good
   game table?").
@@ -58,7 +58,7 @@ the relays).
 - `src/lib/merge.ts` — merges two copies of a trip: newer activity/stay edit wins, votes merge
   per-person by timestamp, comments (on activities and stays) union append-only by id, deletions
   survive via tombstones (`deleted: true`, never hard-remove). Stays merge explicitly from both
-  sides so pre-feature copies can't wipe them; a stay's scalar fields (cost, location,
+  sides so pre-feature copies can't wipe them; a stay's scalar fields (cost, rooms, location,
   customValues) ride along with whichever side's `updatedAt` is newer, same as title/details.
   `stayFields` (the custom column definitions) merge like groceries/bring — LWW list with
   tombstones.

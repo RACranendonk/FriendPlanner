@@ -54,6 +54,8 @@ export interface Stay {
   details: string;
   /** Total cost for the entire stay (not per night/person) — kept numeric so options sort/compare. */
   cost?: number;
+  bedrooms?: number;
+  bathrooms?: number;
   locationName?: string;
   /** Optional map pin, same shape as Activity's. Absent on options nobody has located yet. */
   lat?: number;

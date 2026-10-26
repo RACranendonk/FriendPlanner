@@ -292,12 +292,14 @@ describe('mergeTrips: stays', () => {
     expect(mergeTrips(local, incoming).stays![0].deleted).toBe(true);
   });
 
-  it('lets the newer edit win on cost, location, and custom field values', () => {
+  it('lets the newer edit win on cost, rooms, location, and custom field values', () => {
     const local = makeTrip({
       stays: [
         makeStay({
           updatedAt: 2,
           cost: 900,
+          bedrooms: 2,
+          bathrooms: 1,
           locationName: 'Old town',
           lat: 1,
           lng: 1,
@@ -310,6 +312,8 @@ describe('mergeTrips: stays', () => {
         makeStay({
           updatedAt: 9,
           cost: 1200,
+          bedrooms: 4,
+          bathrooms: 2,
           locationName: 'New town',
           lat: 2,
           lng: 2,
@@ -319,6 +323,8 @@ describe('mergeTrips: stays', () => {
     });
     const merged = mergeTrips(local, incoming).stays![0];
     expect(merged.cost).toBe(1200);
+    expect(merged.bedrooms).toBe(4);
+    expect(merged.bathrooms).toBe(2);
     expect(merged.locationName).toBe('New town');
     expect(merged.lat).toBe(2);
     expect(merged.lng).toBe(2);

@@ -296,6 +296,12 @@ function StaysTable({
           <tr>
             <th>Option</th>
             <th className="num">Cost</th>
+            <th className="center" title="Bedrooms">
+              🛏️
+            </th>
+            <th className="center" title="Bathrooms">
+              🛁
+            </th>
             <th>Location</th>
             {fields.map((f) => (
               <th key={f.id} className="center" title={f.label}>
@@ -323,6 +329,8 @@ function StaysTable({
                   </button>
                 </td>
                 <td className="num">{stay.cost != null ? formatEuro(stay.cost) : '—'}</td>
+                <td className="center">{stay.bedrooms ?? '—'}</td>
+                <td className="center">{stay.bathrooms ?? '—'}</td>
                 <td className="truncate">
                   {stay.locationName || (hasPin ? '📍 Pinned location' : '—')}
                 </td>
@@ -394,6 +402,16 @@ function StayDetail({
           )}
         </div>
         {stay.cost != null && <p className="muted small">💰 {formatEuro(stay.cost)} total</p>}
+        {(stay.bedrooms != null || stay.bathrooms != null) && (
+          <p className="muted small">
+            {[
+              stay.bedrooms != null && `🛏️ ${stay.bedrooms} ${stay.bedrooms === 1 ? 'bedroom' : 'bedrooms'}`,
+              stay.bathrooms != null && `🛁 ${stay.bathrooms} ${stay.bathrooms === 1 ? 'bathroom' : 'bathrooms'}`,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
+        )}
         {(stay.locationName || hasPin) && (
           <p className="muted small">
             📍 {stay.locationName || 'Pinned location'}
@@ -484,6 +502,8 @@ function StayForm({
   const [url, setUrl] = useState(initial?.url ?? '');
   const [details, setDetails] = useState(initial?.details ?? '');
   const [cost, setCost] = useState(initial?.cost != null ? String(initial.cost) : '');
+  const [bedrooms, setBedrooms] = useState(initial?.bedrooms != null ? String(initial.bedrooms) : '');
+  const [bathrooms, setBathrooms] = useState(initial?.bathrooms != null ? String(initial.bathrooms) : '');
   const [locationName, setLocationName] = useState(initial?.locationName ?? '');
   const [customValues, setCustomValues] = useState<Record<string, boolean>>(initial?.customValues ?? {});
 
@@ -518,12 +538,18 @@ function StayForm({
   const submit = () => {
     if (!title.trim()) return;
     const parsedCost = cost.trim() ? Number(cost) : NaN;
+    const parseRooms = (text: string) => {
+      const n = text.trim() ? Number(text) : NaN;
+      return Number.isInteger(n) && n >= 0 ? n : undefined;
+    };
     onSave({
       id: initial?.id ?? crypto.randomUUID(),
       title: title.trim(),
       url: url.trim(),
       details: details.trim(),
       cost: Number.isFinite(parsedCost) ? parsedCost : undefined,
+      bedrooms: parseRooms(bedrooms),
+      bathrooms: parseRooms(bathrooms),
       locationName: locationName.trim(),
       lat: pin?.lat,
       lng: pin?.lng,
@@ -566,6 +592,32 @@ function StayForm({
               inputMode="decimal"
               placeholder="e.g. 1200"
               onChange={(e) => setCost(e.target.value)}
+            />
+          </label>
+        </div>
+        <div className="row">
+          <label className="field">
+            <span>🛏️ Bedrooms</span>
+            <input
+              value={bedrooms}
+              type="number"
+              min="0"
+              step="1"
+              inputMode="numeric"
+              placeholder="e.g. 3"
+              onChange={(e) => setBedrooms(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            <span>🛁 Bathrooms</span>
+            <input
+              value={bathrooms}
+              type="number"
+              min="0"
+              step="1"
+              inputMode="numeric"
+              placeholder="e.g. 2"
+              onChange={(e) => setBathrooms(e.target.value)}
             />
           </label>
         </div>
