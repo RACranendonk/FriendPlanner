@@ -6,6 +6,7 @@ import { MapView, type MapPin } from './MapView';
 import { CommentThread } from './CommentThread';
 import { RATING_CLEARED, RATING_LEVELS, averageRating, effectiveRatings, ratingEmoji } from '../lib/rating';
 import { discussionTooltip, summarizeComments } from '../lib/discussion';
+import { formatEuro } from '../lib/money';
 
 /**
  * Accommodation candidates: share options, vote, argue in comments, crown a
@@ -76,7 +77,7 @@ export function StaysSection({
             emoji: s.decided ? '🏆' : '🏠',
             title: s.title,
             subtitle: [
-              s.cost != null ? `${s.cost.toLocaleString()} total` : null,
+              s.cost != null ? `${formatEuro(s.cost)} total` : null,
               average !== null ? `${ratingEmoji(average)} ${average.toFixed(1)}` : null,
             ]
               .filter((part): part is string => part !== null)
@@ -321,7 +322,7 @@ function StaysTable({
                     {stay.title}
                   </button>
                 </td>
-                <td className="num">{stay.cost != null ? stay.cost.toLocaleString() : '—'}</td>
+                <td className="num">{stay.cost != null ? formatEuro(stay.cost) : '—'}</td>
                 <td className="truncate">
                   {stay.locationName || (hasPin ? '📍 Pinned location' : '—')}
                 </td>
@@ -392,7 +393,7 @@ function StayDetail({
             </span>
           )}
         </div>
-        {stay.cost != null && <p className="muted small">💰 {stay.cost.toLocaleString()} total</p>}
+        {stay.cost != null && <p className="muted small">💰 {formatEuro(stay.cost)} total</p>}
         {(stay.locationName || hasPin) && (
           <p className="muted small">
             📍 {stay.locationName || 'Pinned location'}
@@ -557,7 +558,7 @@ function StayForm({
             <input value={url} placeholder="https://…" inputMode="url" onChange={(e) => setUrl(e.target.value)} />
           </label>
           <label className="field">
-            <span>Total cost (whole stay)</span>
+            <span>Total cost in € (whole stay)</span>
             <input
               value={cost}
               type="number"
