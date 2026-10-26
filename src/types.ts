@@ -189,12 +189,29 @@ export function tripDays(trip: Trip): string[] {
   return days;
 }
 
-/** Earliest start first; trips without a start date go last. ISO dates sort correctly as plain strings. */
-export function sortTripsByStart(trips: Trip[]): Trip[] {
-  return [...trips].sort(
-    (a, b) =>
-      Number(!a.start) - Number(!b.start) || a.start.localeCompare(b.start) || a.name.localeCompare(b.name),
-  );
+/** Today as yyyy-mm-dd in local time (toISOString would give the UTC date, off by one around midnight). */
+export function localToday(now = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
+/**
+ * Home-page order: trips still ahead or underway first, soonest start on top;
+ * trips that have ended go to `past`, most recent first. ISO dates compare
+ * correctly as plain strings; a trip without an end date counts as upcoming.
+ */
+export function splitTripsByDate(trips: Trip[], today: string): { upcoming: Trip[]; past: Trip[] } {
+  const isPast = (t: Trip) => !!t.end && t.end < today;
+  const upcoming = trips
+    .filter((t) => !isPast(t))
+    .sort(
+      (a, b) =>
+        Number(!a.start) - Number(!b.start) || a.start.localeCompare(b.start) || a.name.localeCompare(b.name),
+    );
+  const past = trips
+    .filter(isPast)
+    .sort((a, b) => b.end.localeCompare(a.end) || a.name.localeCompare(b.name));
+  return { upcoming, past };
 }
 
 export function formatDay(iso: string): string {

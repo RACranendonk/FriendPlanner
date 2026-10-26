@@ -17,7 +17,8 @@ like, and the group can see at a glance who's going where — including when you
   passphrase for the group. Typo in the name, dates shifted, or something to tell the group up
   front? The ✏️ next to the trip title edits all of it later — and shrinking the dates never
   loses activities, anything planned outside the new range stays in the plan under its own day.
-  The home screen lists your trips by start date, earliest first.
+  The home screen lists upcoming and ongoing trips on top, soonest first; trips that have ended
+  fold away into a **Past trips** section below, most recent first.
 - **Activities** — title, category (🥾 hike, 🏛️ culture, 🍽️ food, 🏖️ beach, 🚵 sport,
   🌙 nightlife), day and time of day — plus an exact departure time once one is agreed
   ("Morning · 08:30") — notes, a place, and a link (Komoot, tickets, a website — shown labeled by

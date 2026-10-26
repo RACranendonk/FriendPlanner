@@ -371,6 +371,20 @@ a {
   padding: 0.4rem;
 }
 
+.past-trips summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.past-trips summary h2 {
+  display: inline;
+}
+
+.past-trips .trip-list {
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+
 footer {
   text-align: center;
   padding-top: 1rem;

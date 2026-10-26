@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Trip } from '../types';
-import { formatDay, sortTripsByStart } from '../types';
+import { formatDay, localToday, splitTripsByDate } from '../types';
 import { extractToken } from '../lib/share';
 import { deleteTrip, getName, listTripIds, loadTrip, saveTrip, setName, setPassphrase } from '../lib/storage';
 import { DEMO_PASSPHRASE, createDemoTrip } from '../lib/demo';
@@ -18,12 +18,11 @@ export function Home({
 }) {
   const [name, setNameState] = useState(getName());
   const [trips, setTrips] = useState<Trip[]>(() =>
-    sortTripsByStart(
-      listTripIds()
-        .map(loadTrip)
-        .filter((t): t is Trip => t !== null),
-    ),
+    listTripIds()
+      .map(loadTrip)
+      .filter((t): t is Trip => t !== null),
   );
+  const { upcoming, past } = splitTripsByDate(trips, localToday());
   const [creating, setCreating] = useState(false);
   const [joinText, setJoinText] = useState('');
   const [joinError, setJoinError] = useState('');
@@ -75,27 +74,20 @@ export function Home({
         </label>
       </section>
 
-      {trips.length > 0 && (
+      {upcoming.length > 0 && (
         <section>
           <h2>Your trips</h2>
-          <ul className="trip-list">
-            {trips.map((trip) => (
-              <li key={trip.id} className="card trip-item">
-                <button className="trip-open" onClick={() => onOpenTrip(trip.id)}>
-                  <strong>{trip.name}</strong>
-                  <span className="muted">
-                    {trip.destination && `${trip.destination} · `}
-                    {formatDay(trip.start)} – {formatDay(trip.end)} ·{' '}
-                    {trip.activities.filter((a) => !a.deleted).length} activities
-                  </span>
-                </button>
-                <button className="ghost danger" title="Remove from this device" onClick={() => handleDelete(trip)}>
-                  ✕
-                </button>
-              </li>
-            ))}
-          </ul>
+          <TripList trips={upcoming} onOpen={onOpenTrip} onDelete={handleDelete} />
         </section>
+      )}
+
+      {past.length > 0 && (
+        <details className="past-trips" open={upcoming.length === 0}>
+          <summary>
+            <h2>Past trips ({past.length})</h2>
+          </summary>
+          <TripList trips={past} onOpen={onOpenTrip} onDelete={handleDelete} />
+        </details>
       )}
 
       <section className="card">
@@ -154,6 +146,36 @@ export function Home({
         <Credits />
       </footer>
     </div>
+  );
+}
+
+function TripList({
+  trips,
+  onOpen,
+  onDelete,
+}: {
+  trips: Trip[];
+  onOpen: (id: string) => void;
+  onDelete: (trip: Trip) => void;
+}) {
+  return (
+    <ul className="trip-list">
+      {trips.map((trip) => (
+        <li key={trip.id} className="card trip-item">
+          <button className="trip-open" onClick={() => onOpen(trip.id)}>
+            <strong>{trip.name}</strong>
+            <span className="muted">
+              {trip.destination && `${trip.destination} · `}
+              {formatDay(trip.start)} – {formatDay(trip.end)} ·{' '}
+              {trip.activities.filter((a) => !a.deleted).length} activities
+            </span>
+          </button>
+          <button className="ghost danger" title="Remove from this device" onClick={() => onDelete(trip)}>
+            ✕
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 
